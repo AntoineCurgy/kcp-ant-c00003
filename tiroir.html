@@ -50,6 +50,29 @@
     margin-bottom: 2.5rem;
   }
 
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    padding: 0.45rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    transition: border-color 0.15s, color 0.15s, transform 0.1s;
+  }
+
+  .back-link:hover {
+    color: var(--text);
+    border-color: var(--border-hover);
+  }
+
+  .back-link:active { transform: scale(0.98); }
+
   .logo {
     font-size: 11px;
     font-family: var(--font-mono);
@@ -358,6 +381,7 @@
 <div class="container">
 
   <div class="header">
+    <a href="./index.html" class="back-link">← Menu principal</a>
     <div class="logo">KCP — Knowledge Context Protocol</div>
     <h1 class="title">Ouvre un tiroir</h1>
     <p class="subtitle">// sélectionne · copie · colle dans Claude</p>

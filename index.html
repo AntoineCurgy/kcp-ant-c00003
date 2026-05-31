@@ -219,6 +219,31 @@
     opacity: 1;
   }
 
+  /* Bouton Telegram (Mémoire Digitale conversationnelle) — bleu marque Telegram */
+  .btn-telegram {
+    border: 1px solid rgba(42,171,238,0.30);
+    background: rgba(42,171,238,0.12);
+  }
+
+  .btn-telegram:hover {
+    background: rgba(42,171,238,0.18);
+  }
+
+  .btn-telegram .btn-icon {
+    background: rgba(42,171,238,0.20);
+    color: #2aabee;
+  }
+
+  .btn-telegram .btn-arrow {
+    color: #2aabee;
+    opacity: 0.7;
+  }
+
+  .btn-telegram:hover .btn-arrow {
+    color: #2aabee;
+    opacity: 1;
+  }
+
   /* ── SEPARATOR ── */
   .sep {
     height: 1px;
@@ -271,16 +296,32 @@
     <p class="tagline">// C00003 · workspace personnel</p>
   </header>
 
+  <!-- Bouton Telegram : la Mémoire Digitale conversationnelle (canal quotidien) -->
+  <div class="section">
+    <p class="section-label">Ta Mémoire Digitale</p>
+
+    <a href="https://t.me/C00004_Antoine_bot" class="btn btn-telegram" target="_blank" rel="noopener">
+      <div class="btn-left">
+        <div class="btn-icon">✈</div>
+        <div class="btn-text">
+          <span class="btn-title">Telegram</span>
+          <span class="btn-sub">parle à ta mémoire · capture, demande</span>
+        </div>
+      </div>
+      <span class="btn-arrow">→</span>
+    </a>
+  </div>
+
   <!-- Section 1 : accès directs -->
   <div class="section">
     <p class="section-label">Accès rapide</p>
 
-    <a href="https://t.me/memoiredigitale_antoine_bot" class="btn" target="_blank" rel="noopener">
+    <a href="https://www.notion.so/34de29de1f32802eab18fad96e4a4278?v=36ae29de1f32808fa628000c8d3246b8" class="btn" target="_blank" rel="noopener">
       <div class="btn-left">
-        <div class="btn-icon icon-green">💬</div>
+        <div class="btn-icon icon-green">🗂</div>
         <div class="btn-text">
-          <span class="btn-title">Mémoire Digitale</span>
-          <span class="btn-sub">Telegram · capture, demande, tiroir</span>
+          <span class="btn-title">Mes tiroirs</span>
+          <span class="btn-sub">Notion · base de tous tes tiroirs</span>
         </div>
       </div>
       <span class="btn-arrow">→</span>
@@ -288,7 +329,7 @@
 
     <div class="sep"></div>
 
-    <a href="https://www.notion.so/REMPLACER_URL_REUNIONS" class="btn" target="_blank" rel="noopener">
+    <a href="https://www.notion.so/292e29de1f3280ea8e0ce41fb72868a9?v=292e29de1f32800a8a18000cb0dc5fc0" class="btn" target="_blank" rel="noopener">
       <div class="btn-left">
         <div class="btn-icon icon-blue">📋</div>
         <div class="btn-text">
@@ -301,7 +342,7 @@
 
     <div class="sep"></div>
 
-    <a href="https://www.notion.so/REMPLACER_URL_TODO" class="btn" target="_blank" rel="noopener">
+    <a href="https://www.notion.so/349e29de1f3280c5a548ec6be1bbbeee?v=34ae29de1f3280dd978a000c96689df9" class="btn" target="_blank" rel="noopener">
       <div class="btn-left">
         <div class="btn-icon icon-amber">✅</div>
         <div class="btn-text">
@@ -318,7 +359,7 @@
   <div class="section">
     <p class="section-label">Actions</p>
 
-    <a href="https://t.me/memoiredigitale_antoine_bot?start=creer_tiroir" class="btn" target="_blank" rel="noopener">
+    <a href="https://t.me/C00004_Antoine_bot?start=creer_tiroir" class="btn" target="_blank" rel="noopener">
       <div class="btn-left">
         <div class="btn-icon icon-purple">🗂</div>
         <div class="btn-text">
