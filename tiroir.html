@@ -529,7 +529,8 @@
           body: JSON.stringify({ client_id: CONFIG.client_id, tiroir }),
         });
         const data = await res.json();
-        prompt = data.prompt || data.content || data.text || '';
+        const raw = data.prompt || data.content || data.text || '';
+        prompt = raw ? atob(raw) : '';
       }
 
       currentPrompt = prompt;
