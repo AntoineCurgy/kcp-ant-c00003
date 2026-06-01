@@ -526,11 +526,11 @@
         const res = await fetch(CONFIG.webhook_prompt, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ client_id: CONFIG.client_id, tiroir }),
+          body: JSON.stringify({ client_id: CONFIG.client_id, nom_tiroir: tiroir }),
         });
         const data = await res.json();
         const raw = data.prompt || data.content || data.text || '';
-        prompt = raw ? atob(raw) : '';
+        prompt = raw ? decodeURIComponent(escape(atob(raw))) : '';
       }
 
       currentPrompt = prompt;
