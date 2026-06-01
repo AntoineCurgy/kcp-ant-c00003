@@ -447,7 +447,7 @@
     client_id: 'C00003',
     client_name: 'Antoine',
     /* Remplacer ces deux URLs par les vrais webhooks Make */
-    webhook_list:   'https://hook.eu2.make.com/REMPLACER_WEBHOOK_LISTE_TIROIRS',
+    webhook_list:   'https://hook.eu2.make.com/4kskheb6ie4q6nupygterd84uj5kok2g',
     webhook_prompt: 'https://hook.eu2.make.com/REMPLACER_WEBHOOK_PROMPT',
   };
   /* ─────────────────────────────────────────────────────────────────────── */
@@ -491,8 +491,8 @@
 
       tiroirs.forEach(t => {
         const opt = document.createElement('option');
-        opt.value = t.id;
-        opt.textContent = t.label || '#' + t.id;
+        opt.value = t.nom_tiroir;
+        opt.textContent = '#' + t.nom_tiroir;
         sel.appendChild(opt);
       });
     } catch (e) {
