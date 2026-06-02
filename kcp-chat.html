@@ -96,7 +96,13 @@
   .td:nth-child(3) { animation-delay: 0.4s; }
   @keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
 
-  /* COMMAND MENU (Telegram style) */
+  /* LOADING HISTORY */
+  .history-loading {
+    text-align: center; font-size: 10px; font-family: var(--font-mono);
+    color: var(--text-dim); padding: 0.5rem 0;
+  }
+
+  /* COMMAND MENU */
   .cmd-menu {
     display: none; flex-direction: column; flex-shrink: 0;
     margin: 0 1.25rem 0; background: var(--surface);
@@ -212,41 +218,10 @@
 </div>
 
 <div class="messages" id="messages">
-  <div class="day-sep">aujourd'hui</div>
-  <div class="msg ai">
-    <div class="msg-tag systeme">✓ mémoire chargée</div>
-    <div class="bubble">Tiroir <strong>#kcp</strong> actif. Utilise <strong>/</strong> pour choisir ton mode, ou écris directement.</div>
-    <span class="msg-time">système</span>
-  </div>
-
-  <div class="msg user">
-    <div class="bubble">Le pivot Telegram est acté depuis le 11 mai, on est en phase pre-DM</div>
-    <span class="msg-time">maintenant</span>
-  </div>
-  <div class="msg ai">
-    <div class="msg-tag capture">capture</div>
-    <div class="bubble">Noté dans <strong>#kcp</strong> — pivot Telegram acté 2026-05-11, phase pre-DM en cours.</div>
-    <span class="msg-time">maintenant</span>
-  </div>
-
-  <div class="msg user">
-    <div class="bubble">C'est quoi les 4 piliers KCP ?</div>
-    <span class="msg-time">maintenant</span>
-  </div>
-  <div class="msg ai">
-    <div class="msg-tag demande">demande</div>
-    <div class="bubble">
-      Les 4 piliers actés dans <strong>#kcp</strong> :<br><br>
-      <strong>Souveraineté</strong> — la donnée reste chez le client.<br>
-      <strong>Agnosticisme</strong> — compatible Claude, GPT, Gemini.<br>
-      <strong>Externalité</strong> — couche mémoire, hors flux opérationnel.<br>
-      <strong>Universalité</strong> — tout profil d'opérateur complexe.
-    </div>
-    <span class="msg-time">maintenant</span>
-  </div>
+  <div class="history-loading" id="history-loading">chargement de l'historique…</div>
 </div>
 
-<!-- Command menu — appears above input -->
+<!-- Command menu -->
 <div class="cmd-menu" id="cmd-menu">
   <div class="cmd-menu-header">Choisir un mode</div>
   <button class="cmd-option" onclick="setMode('capture')">
@@ -280,18 +255,85 @@
 </div>
 
 <script>
+  const ID_CLIENT   = 'C00003';
+  const WEBHOOK     = 'https://hook.eu2.make.com/8rh94l9v2lk87hr6g1jredxban13ftqu';
+  const WEBHOOK_HIS = 'https://hook.eu2.make.com/26bhrahrq5xipqcem9hpq3jvdgrmd1si';
+
   let activeTiroir = 'kcp';
-  let activeMode = null; // null | 'capture' | 'demande'
-  let menuOpen = false;
+  let activeMode   = null;
+  let menuOpen     = false;
   let chipsVisible = true;
 
-  const inp = document.getElementById('inp');
-  const slashBtn = document.getElementById('slash-btn');
-  const modeChip = document.getElementById('mode-chip');
+  const inp           = document.getElementById('inp');
+  const slashBtn      = document.getElementById('slash-btn');
+  const modeChip      = document.getElementById('mode-chip');
   const modeChipLabel = document.getElementById('mode-chip-label');
-  const inputWrap = document.getElementById('input-wrap');
-  const cmdMenu = document.getElementById('cmd-menu');
-  const sendBtn = document.getElementById('send-btn');
+  const inputWrap     = document.getElementById('input-wrap');
+  const cmdMenu       = document.getElementById('cmd-menu');
+  const sendBtn       = document.getElementById('send-btn');
+  const messagesEl    = document.getElementById('messages');
+
+  /* ── FORMAT TIMESTAMP ── */
+  function fmtTime(ts) {
+    if (!ts) return '';
+    try {
+      const d = new Date(ts);
+      return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
+        + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    } catch { return ''; }
+  }
+
+  /* ── LOAD HISTORY ── */
+  async function loadHistory() {
+    try {
+      const res = await fetch(WEBHOOK_HIS, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_client: ID_CLIENT }),
+      });
+      const raw = await res.text();
+      const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+      const data = JSON.parse(cleaned);
+
+      document.getElementById('history-loading')?.remove();
+
+      if (!data.h || data.h.length === 0) {
+        addSystemMsg('Aucun historique. Utilise <strong>/</strong> pour commencer.');
+        return;
+      }
+
+      // Newest-first from Make → reverse pour affichage chrono
+      const rows = [...data.h].reverse();
+
+      rows.forEach(row => {
+        const tiroir  = row.t || '';
+        const mode    = row.m || 'demande';
+        const message = decodeURIComponent(row.q || '');
+        const reponse = decodeURIComponent(row.r || '');
+        const ts      = fmtTime(row.ts);
+
+        // Message utilisateur
+        addMsgWithTime('user', message.replace(/\n/g, '<br>'), null, null, ts);
+
+        // Réponse IA — strip backticks + parse JSON si besoin
+        let displayText = reponse;
+        try {
+          const stripped = reponse.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+          const parsed = JSON.parse(stripped);
+          displayText = parsed.text || reponse;
+        } catch { /* texte brut, on affiche tel quel */ }
+
+        // Tag tiroir + mode
+        const tagLabel = tiroir ? mode + ' · #' + tiroir : mode;
+        addMsgWithTime('ai', displayText, tagLabel, mode, ts);
+      });
+
+      scrollDown();
+    } catch (e) {
+      document.getElementById('history-loading')?.remove();
+      addSystemMsg('Historique indisponible.');
+    }
+  }
 
   /* ── TIROIR ── */
   document.querySelectorAll('.chip[data-t]').forEach(c => {
@@ -300,7 +342,7 @@
       c.classList.add('active');
       activeTiroir = c.dataset.t;
       document.getElementById('active-label').textContent = '#' + c.dataset.t;
-      addMsg('ai', `Tiroir <strong>#${c.dataset.t}</strong> chargé.`, 'systeme', 'systeme');
+      addSystemMsg(`Tiroir <strong>#${c.dataset.t}</strong> actif.`);
       scrollDown();
     });
   });
@@ -323,7 +365,6 @@
     activeMode = mode;
     menuOpen = false;
     cmdMenu.classList.remove('open');
-
     slashBtn.className = 'slash-btn mode-' + mode;
     modeChipLabel.textContent = mode;
     modeChip.className = 'mode-chip ' + mode + ' visible';
@@ -354,12 +395,15 @@
 
   /* ── MESSAGES ── */
   function addMsg(role, html, tag, tagType) {
-    const msgs = document.getElementById('messages');
+    return addMsgWithTime(role, html, tag, tagType, 'maintenant');
+  }
+
+  function addMsgWithTime(role, html, tag, tagType, time) {
     const div = document.createElement('div');
     div.className = 'msg ' + role;
     if (tag) {
       const t = document.createElement('div');
-      t.className = 'msg-tag ' + (tagType || '');
+      t.className = 'msg-tag ' + (tagType || 'systeme');
       t.textContent = tag;
       div.appendChild(t);
     }
@@ -369,25 +413,36 @@
     div.appendChild(b);
     const m = document.createElement('span');
     m.className = 'msg-time';
-    m.textContent = 'maintenant';
+    m.textContent = time || '';
     div.appendChild(m);
-    msgs.appendChild(div);
+    messagesEl.appendChild(div);
     return div;
   }
 
+  function addSystemMsg(html) {
+    const div = document.createElement('div');
+    div.className = 'msg ai';
+    const t = document.createElement('div');
+    t.className = 'msg-tag systeme';
+    t.textContent = '✓ système';
+    div.appendChild(t);
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    b.innerHTML = html;
+    div.appendChild(b);
+    messagesEl.appendChild(div);
+  }
+
   function showTyping() {
-    const msgs = document.getElementById('messages');
     const d = document.createElement('div');
     d.id = 'typ';
     d.className = 'typing-indicator';
     d.innerHTML = '<div class="td"></div><div class="td"></div><div class="td"></div>';
-    msgs.appendChild(d);
+    messagesEl.appendChild(d);
     scrollDown();
   }
   function hideTyping() { document.getElementById('typ')?.remove(); }
-  function scrollDown() { const m = document.getElementById('messages'); m.scrollTop = m.scrollHeight; }
-
-  const WEBHOOK = 'https://hook.eu2.make.com/8rh94l9v2lk87hr6g1jredxban13ftqu';
+  function scrollDown() { messagesEl.scrollTop = messagesEl.scrollHeight; }
 
   /* ── SEND ── */
   async function send() {
@@ -407,27 +462,23 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id_client: 'C00003',
+          id_client: ID_CLIENT,
           nom_tiroir: activeTiroir,
           mode: mode,
           message: text,
         }),
       });
 
-      // Lire la réponse en texte brut, puis strip des éventuels backticks
-      // (Make / Haiku peut retourner ```json{...}``` avant fix UI Make)
       const rawText = await res.text();
-      const cleaned = rawText
-        .replace(/^```(?:json)?\s*/i, '')
-        .replace(/\s*```$/i, '')
-        .trim();
+      const cleaned = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
 
       let parsed;
       try { parsed = JSON.parse(cleaned); }
       catch { parsed = { type: mode, text: cleaned || 'Réponse vide.' }; }
 
       hideTyping();
-      addMsg('ai', parsed.text || cleaned, parsed.type || mode, parsed.type || mode);
+      const tagLabel = (parsed.type || mode) + ' · #' + activeTiroir;
+      addMsg('ai', parsed.text || cleaned, tagLabel, parsed.type || mode);
     } catch (e) {
       hideTyping();
       addMsg('ai', 'Erreur de connexion. Réessaie.', null, null);
@@ -437,6 +488,9 @@
     sendBtn.disabled = false;
     inp.focus();
   }
+
+  /* ── INIT ── */
+  loadHistory();
 </script>
 </body>
 </html>
