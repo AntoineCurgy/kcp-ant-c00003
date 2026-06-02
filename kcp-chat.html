@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KCP — Chat</title>
+<script src="./config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -198,7 +199,7 @@
 
 <div class="header">
   <div class="header-left">
-    <span class="logo-badge">KCP · C00003 · Antoine</span>
+    <span class="logo-badge" id="logo-badge">KCP · … · …</span>
     <span class="header-title">Mémoire Digitale</span>
   </div>
   <div class="tiroir-pill" onclick="toggleChips()">
@@ -209,12 +210,7 @@
 </div>
 
 <div class="tiroir-row" id="tiroir-row">
-  <button class="chip active" data-t="kcp">#kcp</button>
-  <button class="chip" data-t="migration-yardi">#migration-yardi</button>
-  <button class="chip" data-t="facturation-electronique">#facturation</button>
-  <button class="chip" data-t="make">#make</button>
-  <button class="chip" data-t="societe">#societe</button>
-  <button class="chip" data-t="entrepreneuriat">#entrepreneuriat</button>
+  <!-- chips chargées dynamiquement -->
 </div>
 
 <div class="messages" id="messages">
@@ -255,11 +251,12 @@
 </div>
 
 <script>
-  const ID_CLIENT   = 'C00003';
-  const WEBHOOK     = 'https://hook.eu2.make.com/8rh94l9v2lk87hr6g1jredxban13ftqu';
-  const WEBHOOK_HIS = 'https://hook.eu2.make.com/26bhrahrq5xipqcem9hpq3jvdgrmd1si';
+  const ID_CLIENT        = KCP_CONFIG.client_id;
+  const WEBHOOK          = KCP_CONFIG.webhooks.chat;
+  const WEBHOOK_HIS      = KCP_CONFIG.webhooks.history;
+  const WEBHOOK_TIROIRS  = KCP_CONFIG.webhooks.tiroirs;
 
-  let activeTiroir = 'kcp';
+  let activeTiroir = null;
   let activeMode   = null;
   let menuOpen     = false;
   let chipsVisible = true;
@@ -272,6 +269,49 @@
   const cmdMenu       = document.getElementById('cmd-menu');
   const sendBtn       = document.getElementById('send-btn');
   const messagesEl    = document.getElementById('messages');
+
+  /* ── TIROIRS DYNAMIQUES ── */
+  async function loadTiroirs() {
+    try {
+      const res = await fetch(WEBHOOK_TIROIRS, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_id: ID_CLIENT }),
+      });
+      const tiroirs = await res.json();
+      const row = document.getElementById('tiroir-row');
+      row.innerHTML = '';
+
+      tiroirs.forEach((t, i) => {
+        const name = t.nom_tiroir;
+        const btn = document.createElement('button');
+        btn.className = 'chip' + (i === 0 ? ' active' : '');
+        btn.dataset.t = name;
+        btn.textContent = '#' + name;
+        btn.addEventListener('click', () => selectTiroir(name, btn));
+        row.appendChild(btn);
+        if (i === 0) {
+          activeTiroir = name;
+          document.getElementById('active-label').textContent = '#' + name;
+        }
+      });
+    } catch (e) {
+      // Fallback silencieux — tiroir par défaut
+      activeTiroir = 'kcp';
+      document.getElementById('active-label').textContent = '#kcp';
+      const row = document.getElementById('tiroir-row');
+      row.innerHTML = '<button class="chip active" data-t="kcp">#kcp</button>';
+    }
+  }
+
+  function selectTiroir(name, btn) {
+    document.querySelector('.chip.active')?.classList.remove('active');
+    btn.classList.add('active');
+    activeTiroir = name;
+    document.getElementById('active-label').textContent = '#' + name;
+    addSystemMsg(`Tiroir <strong>#${name}</strong> actif.`);
+    scrollDown();
+  }
 
   /* ── FORMAT TIMESTAMP ── */
   function fmtTime(ts) {
@@ -335,18 +375,7 @@
     }
   }
 
-  /* ── TIROIR ── */
-  document.querySelectorAll('.chip[data-t]').forEach(c => {
-    c.addEventListener('click', () => {
-      document.querySelector('.chip.active')?.classList.remove('active');
-      c.classList.add('active');
-      activeTiroir = c.dataset.t;
-      document.getElementById('active-label').textContent = '#' + c.dataset.t;
-      addSystemMsg(`Tiroir <strong>#${c.dataset.t}</strong> actif.`);
-      scrollDown();
-    });
-  });
-
+  /* ── TOGGLE CHIPS ── */
   function toggleChips() {
     const row = document.getElementById('tiroir-row');
     chipsVisible = !chipsVisible;
@@ -490,7 +519,9 @@
   }
 
   /* ── INIT ── */
-  loadHistory();
+  document.getElementById('logo-badge').textContent =
+    'KCP · ' + KCP_CONFIG.client_id + ' · ' + KCP_CONFIG.client_name;
+  loadTiroirs().then(() => loadHistory());
 </script>
 </body>
 </html>
