@@ -25,6 +25,15 @@
     max-width: 480px; margin: 0 auto;
   }
 
+  /* BACK LINK */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    font-size: 10px; font-family: var(--font-mono); color: var(--text-dim);
+    text-decoration: none; margin-bottom: 3px;
+    transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--text-muted); }
+
   /* HEADER */
   .header {
     padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--border);
@@ -199,6 +208,7 @@
 
 <div class="header">
   <div class="header-left">
+    <a href="./index.html" class="back-link">← Accueil</a>
     <span class="logo-badge" id="logo-badge">KCP · … · …</span>
     <span class="header-title">Mémoire Digitale</span>
   </div>
