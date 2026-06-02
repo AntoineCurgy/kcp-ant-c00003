@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KCP — Chat</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #222222;
+    --border: #2e2e2e; --border-hover: #444;
+    --text: #f0ede8; --text-muted: #888; --text-dim: #555;
+    --accent: #c8f55a;
+    --accent-dim: rgba(200,245,90,0.10); --accent-border: rgba(200,245,90,0.25);
+    --blue: #64b4ff; --blue-dim: rgba(100,180,255,0.10); --blue-border: rgba(100,180,255,0.25);
+    --purple: #b478ff; --purple-dim: rgba(180,120,255,0.10); --purple-border: rgba(180,120,255,0.25);
+    --font-display: 'Syne', sans-serif; --font-mono: 'DM Mono', monospace;
+  }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--text); font-family: var(--font-display);
+    display: flex; flex-direction: column; height: 100vh;
+    max-width: 480px; margin: 0 auto;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0; background: var(--surface);
+  }
+  .header-left { display: flex; flex-direction: column; gap: 2px; }
+  .logo-badge { font-size: 9px; font-family: var(--font-mono); color: var(--accent); letter-spacing: 0.18em; text-transform: uppercase; }
+  .header-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+  .tiroir-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 0.28rem 0.75rem; border: 1px solid var(--accent-border);
+    background: var(--accent-dim); border-radius: 100px;
+    font-size: 11px; font-family: var(--font-mono); color: var(--accent);
+    cursor: pointer; transition: background 0.12s;
+  }
+  .tiroir-pill:hover { background: rgba(200,245,90,0.16); }
+  .pulse-dot {
+    width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0;
+    animation: pulse 2.2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.8)} }
+
+  /* TIROIR CHIPS */
+  .tiroir-row {
+    display: flex; gap: 6px; padding: 0.55rem 1.25rem;
+    border-bottom: 1px solid var(--border); overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
+  }
+  .tiroir-row::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0; padding: 0.28rem 0.7rem; border-radius: 100px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text-dim); font-size: 11px; font-family: var(--font-mono);
+    cursor: pointer; transition: all 0.12s; white-space: nowrap;
+  }
+  .chip:hover { border-color: var(--border-hover); color: var(--text-muted); }
+  .chip.active { border-color: var(--accent-border); background: var(--accent-dim); color: var(--accent); }
+
+  /* MESSAGES */
+  .messages {
+    flex: 1; overflow-y: auto; padding: 1.25rem 1.25rem 0.5rem;
+    display: flex; flex-direction: column; gap: 0.75rem; scroll-behavior: smooth;
+  }
+  .messages::-webkit-scrollbar { width: 3px; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .day-sep { text-align: center; font-size: 10px; font-family: var(--font-mono); color: var(--text-dim); margin: 0.25rem 0; }
+  .msg { display: flex; flex-direction: column; max-width: 84%; }
+  .msg.user { align-self: flex-end; align-items: flex-end; }
+  .msg.ai { align-self: flex-start; align-items: flex-start; }
+  .msg-tag {
+    font-size: 9px; font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1px 7px; border-radius: 4px; margin-bottom: 4px;
+  }
+  .msg-tag.capture { color: var(--blue); background: var(--blue-dim); border: 1px solid var(--blue-border); }
+  .msg-tag.demande { color: var(--purple); background: var(--purple-dim); border: 1px solid var(--purple-border); }
+  .msg-tag.systeme { color: var(--accent); background: var(--accent-dim); border: 1px solid var(--accent-border); }
+  .bubble { padding: 0.65rem 0.9rem; border-radius: 14px; font-size: 14px; line-height: 1.55; }
+  .msg.user .bubble { background: var(--accent-dim); border: 1px solid var(--accent-border); color: var(--text); border-bottom-right-radius: 4px; }
+  .msg.ai .bubble { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
+  .msg-time { font-size: 10px; font-family: var(--font-mono); color: var(--text-dim); margin-top: 3px; padding: 0 4px; }
+
+  /* TYPING */
+  .typing-indicator {
+    display: flex; align-items: center; gap: 4px;
+    padding: 0.65rem 0.9rem; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; border-bottom-left-radius: 4px; align-self: flex-start; margin-bottom: 0.25rem;
+  }
+  .td { width: 5px; height: 5px; border-radius: 50%; background: var(--text-dim); animation: blink 1.2s ease-in-out infinite; }
+  .td:nth-child(2) { animation-delay: 0.2s; }
+  .td:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+
+  /* COMMAND MENU (Telegram style) */
+  .cmd-menu {
+    display: none; flex-direction: column; flex-shrink: 0;
+    margin: 0 1.25rem 0; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px;
+    overflow: hidden;
+  }
+  .cmd-menu.open { display: flex; }
+  .cmd-menu-header {
+    padding: 0.45rem 0.9rem;
+    font-size: 9px; font-family: var(--font-mono); color: var(--text-dim);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .cmd-option {
+    display: flex; align-items: center; gap: 0.85rem;
+    padding: 0.7rem 0.9rem; background: transparent; border: none;
+    cursor: pointer; text-align: left; transition: background 0.1s; width: 100%;
+    border-top: 1px solid var(--border);
+  }
+  .cmd-option:first-of-type { border-top: none; }
+  .cmd-option:hover { background: var(--surface2); }
+  .cmd-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 13px; font-weight: 500; flex-shrink: 0;
+  }
+  .cmd-icon.capture { background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue-border); }
+  .cmd-icon.demande { background: var(--purple-dim); color: var(--purple); border: 1px solid var(--purple-border); }
+  .cmd-text { display: flex; flex-direction: column; gap: 1px; }
+  .cmd-name { font-size: 13px; font-family: var(--font-mono); font-weight: 500; }
+  .cmd-name.capture { color: var(--blue); }
+  .cmd-name.demande { color: var(--purple); }
+  .cmd-desc { font-size: 11px; font-family: var(--font-mono); color: var(--text-dim); }
+
+  /* INPUT AREA */
+  .input-area {
+    padding: 0.85rem 1.25rem; border-top: 1px solid var(--border);
+    display: flex; gap: 0.6rem; align-items: flex-end; flex-shrink: 0; background: var(--bg);
+  }
+  .slash-btn {
+    width: 38px; height: 38px; flex-shrink: 0;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 16px; font-weight: 500; color: var(--text-dim);
+    transition: all 0.12s; line-height: 1;
+  }
+  .slash-btn:hover { border-color: var(--border-hover); color: var(--text-muted); }
+  .slash-btn.active { border-color: var(--border-hover); color: var(--text); background: var(--surface2); }
+  .slash-btn.mode-capture { border-color: var(--blue-border); background: var(--blue-dim); color: var(--blue); }
+  .slash-btn.mode-demande { border-color: var(--purple-border); background: var(--purple-dim); color: var(--purple); }
+
+  .input-wrap {
+    flex: 1; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; display: flex; align-items: flex-end;
+    padding: 0 0.85rem; transition: border-color 0.15s; gap: 0.5rem;
+  }
+  .input-wrap:focus-within { border-color: var(--accent-border); }
+  .input-wrap.mode-capture:focus-within { border-color: var(--blue-border); }
+  .input-wrap.mode-demande:focus-within { border-color: var(--purple-border); }
+
+  .mode-chip {
+    display: none; align-items: center; gap: 4px;
+    padding: 2px 6px; border-radius: 5px; margin: 0.7rem 0 0.7rem -0.15rem;
+    font-size: 9px; font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase;
+    flex-shrink: 0; cursor: default;
+  }
+  .mode-chip.capture { color: var(--blue); background: var(--blue-dim); border: 1px solid var(--blue-border); }
+  .mode-chip.demande { color: var(--purple); background: var(--purple-dim); border: 1px solid var(--purple-border); }
+  .mode-chip.visible { display: flex; }
+  .chip-clear { background: none; border: none; cursor: pointer; color: inherit; opacity: 0.55; font-size: 12px; line-height: 1; padding: 0; }
+  .chip-clear:hover { opacity: 1; }
+
+  textarea {
+    flex: 1; background: transparent; border: none; outline: none;
+    color: var(--text); font-family: var(--font-display); font-size: 14px;
+    resize: none; padding: 0.7rem 0; line-height: 1.45; max-height: 90px;
+  }
+  textarea::placeholder { color: var(--text-dim); }
+
+  .send-btn {
+    width: 38px; height: 38px; background: var(--accent); border: none;
+    border-radius: 10px; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0; color: #0f0f0f;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .send-btn:hover { opacity: 0.88; }
+  .send-btn:active { transform: scale(0.94); }
+  .send-btn:disabled { opacity: 0.25; cursor: default; transform: none; }
+  .send-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <span class="logo-badge">KCP · C00003 · Antoine</span>
+    <span class="header-title">Mémoire Digitale</span>
+  </div>
+  <div class="tiroir-pill" onclick="toggleChips()">
+    <div class="pulse-dot"></div>
+    <span id="active-label">#kcp</span>
+    <span style="font-size:10px;opacity:0.5">▾</span>
+  </div>
+</div>
+
+<div class="tiroir-row" id="tiroir-row">
+  <button class="chip active" data-t="kcp">#kcp</button>
+  <button class="chip" data-t="migration-yardi">#migration-yardi</button>
+  <button class="chip" data-t="facturation-electronique">#facturation</button>
+  <button class="chip" data-t="make">#make</button>
+  <button class="chip" data-t="societe">#societe</button>
+  <button class="chip" data-t="entrepreneuriat">#entrepreneuriat</button>
+</div>
+
+<div class="messages" id="messages">
+  <div class="day-sep">aujourd'hui</div>
+  <div class="msg ai">
+    <div class="msg-tag systeme">✓ mémoire chargée</div>
+    <div class="bubble">Tiroir <strong>#kcp</strong> actif. Utilise <strong>/</strong> pour choisir ton mode, ou écris directement.</div>
+    <span class="msg-time">système</span>
+  </div>
+
+  <div class="msg user">
+    <div class="bubble">Le pivot Telegram est acté depuis le 11 mai, on est en phase pre-DM</div>
+    <span class="msg-time">maintenant</span>
+  </div>
+  <div class="msg ai">
+    <div class="msg-tag capture">capture</div>
+    <div class="bubble">Noté dans <strong>#kcp</strong> — pivot Telegram acté 2026-05-11, phase pre-DM en cours.</div>
+    <span class="msg-time">maintenant</span>
+  </div>
+
+  <div class="msg user">
+    <div class="bubble">C'est quoi les 4 piliers KCP ?</div>
+    <span class="msg-time">maintenant</span>
+  </div>
+  <div class="msg ai">
+    <div class="msg-tag demande">demande</div>
+    <div class="bubble">
+      Les 4 piliers actés dans <strong>#kcp</strong> :<br><br>
+      <strong>Souveraineté</strong> — la donnée reste chez le client.<br>
+      <strong>Agnosticisme</strong> — compatible Claude, GPT, Gemini.<br>
+      <strong>Externalité</strong> — couche mémoire, hors flux opérationnel.<br>
+      <strong>Universalité</strong> — tout profil d'opérateur complexe.
+    </div>
+    <span class="msg-time">maintenant</span>
+  </div>
+</div>
+
+<!-- Command menu — appears above input -->
+<div class="cmd-menu" id="cmd-menu">
+  <div class="cmd-menu-header">Choisir un mode</div>
+  <button class="cmd-option" onclick="setMode('capture')">
+    <div class="cmd-icon capture">/cap</div>
+    <div class="cmd-text">
+      <span class="cmd-name capture">/capture</span>
+      <span class="cmd-desc">Enregistrer une info dans ta mémoire</span>
+    </div>
+  </button>
+  <button class="cmd-option" onclick="setMode('demande')">
+    <div class="cmd-icon demande">/dem</div>
+    <div class="cmd-text">
+      <span class="cmd-name demande">/demande</span>
+      <span class="cmd-desc">Poser une question à ta mémoire</span>
+    </div>
+  </button>
+</div>
+
+<div class="input-area">
+  <button class="slash-btn" id="slash-btn" onclick="toggleMenu()">/</button>
+  <div class="input-wrap" id="input-wrap">
+    <span class="mode-chip" id="mode-chip">
+      <span id="mode-chip-label"></span>
+      <button class="chip-clear" onclick="clearMode()" title="Désactiver le mode">×</button>
+    </span>
+    <textarea id="inp" rows="1" placeholder="Capture une info ou pose une question…" onkeydown="handleKey(event)"></textarea>
+  </div>
+  <button class="send-btn" id="send-btn" onclick="send()">
+    <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+  </button>
+</div>
+
+<script>
+  let activeTiroir = 'kcp';
+  let activeMode = null; // null | 'capture' | 'demande'
+  let menuOpen = false;
+  let chipsVisible = true;
+
+  const inp = document.getElementById('inp');
+  const slashBtn = document.getElementById('slash-btn');
+  const modeChip = document.getElementById('mode-chip');
+  const modeChipLabel = document.getElementById('mode-chip-label');
+  const inputWrap = document.getElementById('input-wrap');
+  const cmdMenu = document.getElementById('cmd-menu');
+  const sendBtn = document.getElementById('send-btn');
+
+  /* ── TIROIR ── */
+  document.querySelectorAll('.chip[data-t]').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelector('.chip.active')?.classList.remove('active');
+      c.classList.add('active');
+      activeTiroir = c.dataset.t;
+      document.getElementById('active-label').textContent = '#' + c.dataset.t;
+      addMsg('ai', `Tiroir <strong>#${c.dataset.t}</strong> chargé.`, 'systeme', 'systeme');
+      scrollDown();
+    });
+  });
+
+  function toggleChips() {
+    const row = document.getElementById('tiroir-row');
+    chipsVisible = !chipsVisible;
+    row.style.display = chipsVisible ? 'flex' : 'none';
+  }
+
+  /* ── COMMAND MENU ── */
+  function toggleMenu() {
+    menuOpen = !menuOpen;
+    cmdMenu.classList.toggle('open', menuOpen);
+    slashBtn.classList.toggle('active', menuOpen);
+    if (menuOpen) scrollDown();
+  }
+
+  function setMode(mode) {
+    activeMode = mode;
+    menuOpen = false;
+    cmdMenu.classList.remove('open');
+
+    slashBtn.className = 'slash-btn mode-' + mode;
+    modeChipLabel.textContent = mode;
+    modeChip.className = 'mode-chip ' + mode + ' visible';
+    inputWrap.className = 'input-wrap mode-' + mode;
+    inp.placeholder = mode === 'capture' ? 'Capture une info…' : 'Pose ta question…';
+    inp.focus();
+  }
+
+  function clearMode() {
+    activeMode = null;
+    slashBtn.className = 'slash-btn';
+    modeChip.className = 'mode-chip';
+    inputWrap.className = 'input-wrap';
+    inp.placeholder = 'Capture une info ou pose une question…';
+    inp.focus();
+  }
+
+  /* ── TEXTAREA ── */
+  inp.addEventListener('input', () => {
+    inp.style.height = 'auto';
+    inp.style.height = Math.min(inp.scrollHeight, 90) + 'px';
+  });
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+    if (menuOpen && e.key === 'Escape') { toggleMenu(); }
+  }
+
+  /* ── MESSAGES ── */
+  function addMsg(role, html, tag, tagType) {
+    const msgs = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = 'msg ' + role;
+    if (tag) {
+      const t = document.createElement('div');
+      t.className = 'msg-tag ' + (tagType || '');
+      t.textContent = tag;
+      div.appendChild(t);
+    }
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    b.innerHTML = html;
+    div.appendChild(b);
+    const m = document.createElement('span');
+    m.className = 'msg-time';
+    m.textContent = 'maintenant';
+    div.appendChild(m);
+    msgs.appendChild(div);
+    return div;
+  }
+
+  function showTyping() {
+    const msgs = document.getElementById('messages');
+    const d = document.createElement('div');
+    d.id = 'typ';
+    d.className = 'typing-indicator';
+    d.innerHTML = '<div class="td"></div><div class="td"></div><div class="td"></div>';
+    msgs.appendChild(d);
+    scrollDown();
+  }
+  function hideTyping() { document.getElementById('typ')?.remove(); }
+  function scrollDown() { const m = document.getElementById('messages'); m.scrollTop = m.scrollHeight; }
+
+  const WEBHOOK = 'https://hook.eu2.make.com/8rh94l9v2lk87hr6g1jredxban13ftqu';
+
+  /* ── SEND ── */
+  async function send() {
+    const text = inp.value.trim();
+    if (!text) return;
+    const mode = activeMode || 'demande';
+    sendBtn.disabled = true;
+    inp.value = '';
+    inp.style.height = 'auto';
+
+    addMsg('user', text.replace(/\n/g, '<br>'));
+    scrollDown();
+    showTyping();
+
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id_client: 'C00003',
+          nom_tiroir: activeTiroir,
+          mode: mode,
+          message: text,
+        }),
+      });
+
+      // Lire la réponse en texte brut, puis strip des éventuels backticks
+      // (Make / Haiku peut retourner ```json{...}``` avant fix UI Make)
+      const rawText = await res.text();
+      const cleaned = rawText
+        .replace(/^```(?:json)?\s*/i, '')
+        .replace(/\s*```$/i, '')
+        .trim();
+
+      let parsed;
+      try { parsed = JSON.parse(cleaned); }
+      catch { parsed = { type: mode, text: cleaned || 'Réponse vide.' }; }
+
+      hideTyping();
+      addMsg('ai', parsed.text || cleaned, parsed.type || mode, parsed.type || mode);
+    } catch (e) {
+      hideTyping();
+      addMsg('ai', 'Erreur de connexion. Réessaie.', null, null);
+    }
+
+    scrollDown();
+    sendBtn.disabled = false;
+    inp.focus();
+  }
+</script>
+</body>
+</html>
