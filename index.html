@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
     --bg: #0f0f0f;
     --surface: #1a1a1a;
@@ -25,14 +24,12 @@
     --font-display: 'Syne', sans-serif;
     --font-mono: 'DM Mono', monospace;
   }
-
   html, body {
     min-height: 100vh;
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-display);
   }
-
   body {
     display: flex;
     flex-direction: column;
@@ -41,7 +38,6 @@
     padding: 2.5rem 1.25rem;
     min-height: 100vh;
   }
-
   /* Subtle grid background */
   body::before {
     content: '';
@@ -54,20 +50,17 @@
     pointer-events: none;
     z-index: 0;
   }
-
   .container {
     width: 100%;
     max-width: 420px;
     position: relative;
     z-index: 1;
   }
-
   /* ── HEADER ── */
   .header {
     text-align: center;
     margin-bottom: 2.5rem;
   }
-
   .logo {
     display: inline-block;
     font-size: 10px;
@@ -81,7 +74,6 @@
     border-radius: 100px;
     background: var(--accent-dim);
   }
-
   .greeting {
     font-size: 36px;
     font-weight: 700;
@@ -89,17 +81,14 @@
     letter-spacing: -0.02em;
     margin-bottom: 0.5rem;
   }
-
   .greeting .name {
     color: var(--accent);
   }
-
   .tagline {
     font-size: 13px;
     font-family: var(--font-mono);
     color: var(--text-dim);
   }
-
   /* ── SECTIONS ── */
   .section {
     background: var(--surface);
@@ -109,7 +98,6 @@
     margin-bottom: 0.75rem;
     overflow: hidden;
   }
-
   .section-label {
     font-size: 10px;
     font-family: var(--font-mono);
@@ -118,7 +106,6 @@
     text-transform: uppercase;
     padding: 0.5rem 0.75rem 0.35rem;
   }
-
   /* ── BUTTONS ── */
   .btn {
     display: flex;
@@ -135,22 +122,18 @@
     transition: background 0.12s, transform 0.1s;
     gap: 0.75rem;
   }
-
   .btn:hover {
     background: var(--surface2);
   }
-
   .btn:active {
     transform: scale(0.985);
     background: var(--surface2);
   }
-
   .btn-left {
     display: flex;
     align-items: center;
     gap: 0.75rem;
   }
-
   .btn-icon {
     width: 34px;
     height: 34px;
@@ -161,24 +144,20 @@
     flex-shrink: 0;
     font-size: 16px;
   }
-
   .icon-green  { background: rgba(200,245,90,0.12);  color: var(--accent); }
   .icon-blue   { background: rgba(100,180,255,0.12); color: #64b4ff; }
   .icon-amber  { background: rgba(255,190,80,0.12);  color: #ffbe50; }
   .icon-purple { background: rgba(180,120,255,0.12); color: #b478ff; }
   .icon-coral  { background: rgba(255,120,100,0.12); color: #ff7864; }
-
   .btn-text {
     text-align: left;
   }
-
   .btn-title {
     font-size: 15px;
     font-weight: 600;
     display: block;
     line-height: 1.2;
   }
-
   .btn-sub {
     font-size: 11px;
     font-family: var(--font-mono);
@@ -186,71 +165,58 @@
     display: block;
     margin-top: 1px;
   }
-
   .btn-arrow {
     font-size: 16px;
     color: var(--text-dim);
     flex-shrink: 0;
     transition: color 0.12s, transform 0.12s;
   }
-
   .btn:hover .btn-arrow {
     color: var(--text-muted);
     transform: translateX(2px);
   }
-
   /* Highlight pour le bouton IA */
   .btn-highlight {
     border: 1px solid var(--accent-border);
     background: var(--accent-dim);
   }
-
   .btn-highlight:hover {
     background: rgba(200,245,90,0.15);
   }
-
   .btn-highlight .btn-arrow {
     color: var(--accent);
     opacity: 0.7;
   }
-
   .btn-highlight:hover .btn-arrow {
     color: var(--accent);
     opacity: 1;
   }
-
   /* Bouton Telegram (Mémoire Digitale conversationnelle) — bleu marque Telegram */
   .btn-telegram {
     border: 1px solid rgba(42,171,238,0.30);
     background: rgba(42,171,238,0.12);
   }
-
   .btn-telegram:hover {
     background: rgba(42,171,238,0.18);
   }
-
   .btn-telegram .btn-icon {
     background: rgba(42,171,238,0.20);
     color: #2aabee;
   }
-
   .btn-telegram .btn-arrow {
     color: #2aabee;
     opacity: 0.7;
   }
-
   .btn-telegram:hover .btn-arrow {
     color: #2aabee;
     opacity: 1;
   }
-
   /* ── SEPARATOR ── */
   .sep {
     height: 1px;
     background: var(--border);
     margin: 0 0.5rem;
   }
-
   /* ── FOOTER ── */
   .footer {
     display: flex;
@@ -259,7 +225,6 @@
     gap: 0.5rem;
     margin-top: 1.75rem;
   }
-
   .dot {
     width: 6px;
     height: 6px;
@@ -267,18 +232,15 @@
     background: var(--accent);
     animation: pulse 2.2s ease-in-out infinite;
   }
-
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50%       { opacity: 0.3; transform: scale(0.8); }
   }
-
   .footer-text {
     font-size: 11px;
     font-family: var(--font-mono);
     color: var(--text-dim);
   }
-
   /* ── RESPONSIVE ── */
   @media (max-width: 380px) {
     .greeting { font-size: 28px; }
@@ -287,9 +249,7 @@
 </style>
 </head>
 <body>
-
 <div class="container">
-
   <header class="header">
     <span class="logo">KCP — Knowledge Context Protocol</span>
     <h1 class="greeting">Bonjour <span class="name">Antoine</span></h1>
@@ -299,7 +259,6 @@
   <!-- Bouton Telegram : la Mémoire Digitale conversationnelle (canal quotidien) -->
   <div class="section">
     <p class="section-label">Ta Mémoire Digitale</p>
-
     <a href="https://t.me/C00004_Antoine_bot" class="btn btn-telegram" target="_blank" rel="noopener">
       <div class="btn-left">
         <div class="btn-icon">✈</div>
@@ -315,7 +274,6 @@
   <!-- Section 1 : accès directs -->
   <div class="section">
     <p class="section-label">Accès rapide</p>
-
     <a href="https://www.notion.so/34de29de1f32802eab18fad96e4a4278?v=36ae29de1f32808fa628000c8d3246b8" class="btn" target="_blank" rel="noopener">
       <div class="btn-left">
         <div class="btn-icon icon-green">🗂</div>
@@ -326,9 +284,7 @@
       </div>
       <span class="btn-arrow">→</span>
     </a>
-
     <div class="sep"></div>
-
     <a href="https://www.notion.so/292e29de1f3280ea8e0ce41fb72868a9?v=292e29de1f32800a8a18000cb0dc5fc0" class="btn" target="_blank" rel="noopener">
       <div class="btn-left">
         <div class="btn-icon icon-blue">📋</div>
@@ -339,9 +295,7 @@
       </div>
       <span class="btn-arrow">→</span>
     </a>
-
     <div class="sep"></div>
-
     <a href="https://www.notion.so/349e29de1f3280c5a548ec6be1bbbeee?v=34ae29de1f3280dd978a000c96689df9" class="btn" target="_blank" rel="noopener">
       <div class="btn-left">
         <div class="btn-icon icon-amber">✅</div>
@@ -352,12 +306,24 @@
       </div>
       <span class="btn-arrow">→</span>
     </a>
-
   </div>
 
   <!-- Section 2 : actions -->
   <div class="section">
     <p class="section-label">Actions</p>
+
+    <a href="./kcp-chat.html" class="btn">
+      <div class="btn-left">
+        <div class="btn-icon icon-blue">💬</div>
+        <div class="btn-text">
+          <span class="btn-title">Chat mémoire</span>
+          <span class="btn-sub">web · capture et demande</span>
+        </div>
+      </div>
+      <span class="btn-arrow">→</span>
+    </a>
+
+    <div class="sep"></div>
 
     <a href="https://t.me/C00004_Antoine_bot?start=creer_tiroir" class="btn" target="_blank" rel="noopener">
       <div class="btn-left">
@@ -389,8 +355,6 @@
     <div class="dot"></div>
     <span class="footer-text">système actif · KCP V2</span>
   </footer>
-
 </div>
-
 </body>
 </html>
