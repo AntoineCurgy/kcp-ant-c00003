@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KCP — Ouvrir un tiroir</title>
+<script src="./config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -434,7 +435,7 @@
   <div class="footer">
     <div class="client-badge">
       <div class="dot"></div>
-      <span id="client-label">C00003 · Antoine</span>
+      <span id="client-label">… · …</span>
     </div>
     <button class="reset-btn" onclick="reset()">↺ réinitialiser</button>
   </div>
@@ -444,13 +445,11 @@
 <script>
   /* ─── CONFIG ─────────────────────────────────────────────────────────── */
   const CONFIG = {
-    client_id: 'C00003',
-    client_name: 'Antoine',
-    /* Remplacer ces deux URLs par les vrais webhooks Make */
-    webhook_list:   'https://hook.eu2.make.com/4kskheb6ie4q6nupygterd84uj5kok2g',
-    webhook_prompt: 'https://hook.eu2.make.com/q86mcoelj49v49gcobam9tbixur6xvm5',
+    client_id:     KCP_CONFIG.client_id,
+    client_name:   KCP_CONFIG.client_name,
+    webhook_list:  KCP_CONFIG.webhooks.tiroirs,
+    webhook_prompt: KCP_CONFIG.webhooks.prompt,
   };
-  /* ─────────────────────────────────────────────────────────────────────── */
 
   let currentPrompt = '';
   let currentLLM = '';
@@ -468,26 +467,12 @@
   /* Charger la liste des tiroirs au démarrage */
   async function loadTiroirs() {
     try {
-      /* Données de démo si le webhook n'est pas encore configuré */
-      const isDev = CONFIG.webhook_list.includes('REMPLACER');
-      let tiroirs;
-
-      if (isDev) {
-        tiroirs = [
-          { id: 'kcp',              label: '#kcp' },
-          { id: 'migration-yardi',  label: '#migration-yardi' },
-          { id: 'facturation',      label: '#facturation' },
-          { id: 'yooz',             label: '#yooz' },
-          { id: 'make',             label: '#make' },
-        ];
-      } else {
-        const res = await fetch(CONFIG.webhook_list, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ client_id: CONFIG.client_id }),
-        });
-        tiroirs = await res.json();
-      }
+      const res = await fetch(CONFIG.webhook_list, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_id: CONFIG.client_id }),
+      });
+      const tiroirs = await res.json();
 
       tiroirs.forEach(t => {
         const opt = document.createElement('option');
@@ -516,22 +501,14 @@
     showLoading(true);
 
     try {
-      const isDev = CONFIG.webhook_prompt.includes('REMPLACER');
-      let prompt;
-
-      if (isDev) {
-        await new Promise(r => setTimeout(r, 800));
-        prompt = `## CONFIGURATION\nid_client       : ${CONFIG.client_id}\nnom_tiroir      : ${tiroir}\nsource          : llm\nwebhook         : https://hook.eu2.make.com/yd3clx7t5yozoppfcdegocw51n8yeehc\n\n[Contenu du TIA_Prompt pour le tiroir #${tiroir} — sera injecté dynamiquement par Make depuis Notion]\n\nBloc 1 — INITIALISATION\nCette conversation est dédiée EXCLUSIVEMENT au tiroir indiqué en CONFIGURATION.\n...`;
-      } else {
-        const res = await fetch(CONFIG.webhook_prompt, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ client_id: CONFIG.client_id, nom_tiroir: tiroir }),
-        });
-        const data = await res.json();
-        const raw = data.prompt || data.content || data.text || '';
-        prompt = raw ? decodeURIComponent(escape(atob(raw))) : '';
-      }
+      const res = await fetch(CONFIG.webhook_prompt, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_id: CONFIG.client_id, nom_tiroir: tiroir }),
+      });
+      const data = await res.json();
+      const raw = data.prompt || data.content || data.text || '';
+      const prompt = raw ? decodeURIComponent(escape(atob(raw))) : '';
 
       currentPrompt = prompt;
       await copyToClipboard(prompt);
@@ -595,6 +572,8 @@
     errorEl.classList.remove('visible');
   }
 
+  document.getElementById('client-label').textContent =
+    KCP_CONFIG.client_id + ' · ' + KCP_CONFIG.client_name;
   loadTiroirs();
 </script>
 </body>
