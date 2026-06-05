@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KCP — Initialiser une IA</title>
+<script src="./config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#f6f4ee; --surface:#ffffff; --surface2:#efece2;
+    --border:#d3cebd; --border-strong:#b8b2a0;
+    --ink:#16150f; --ink-soft:#3d3b30; --muted:#524e3e;
+    --accent:#c8f55a; --accent-deep:#4d6b14;
+    --dark:#14160f; --dark-soft:#1d2016; --dark-border:#2c2f22;
+    --dark-text:#eef0e5; --dark-muted:#9aa088;
+    --r:14px; --font:'Syne',sans-serif; --mono:'DM Mono',monospace;
+  }
+  html { background:#14160f; min-height:100vh; padding:0 1.5rem; }
+  body { background:var(--bg); color:var(--ink); font-family:var(--font); max-width:520px; margin:0 auto;  min-height:calc(100vh - 4rem); display:flex; flex-direction:column; align-items:center; padding:2.5rem 2rem 3rem; }
+  .wrap { width:100%; max-width:400px; display:flex; flex-direction:column; gap:1.15rem; }
+
+  .back { display:inline-flex; align-items:center; gap:0.4rem; font-size:13px; font-family:var(--mono); font-weight:500; color:var(--ink-soft); text-decoration:none; padding:0.45rem 0.9rem; border:1.5px solid var(--border-strong); border-radius:100px; background:var(--surface); transition:all 0.15s; align-self:flex-start; margin-bottom:1.4rem; }
+  .back:hover { color:var(--ink); border-color:var(--ink); }
+  .kcp-tag { font-size:11px; font-family:var(--mono); color:var(--accent-deep); letter-spacing:0.15em; text-transform:uppercase; display:block; margin-bottom:0.3rem; }
+  .page-title { font-size:28px; font-weight:700; letter-spacing:-0.02em; }
+
+  .card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); padding:1.5rem; box-shadow:0 1px 6px rgba(22,21,15,0.06); display:flex; flex-direction:column; gap:1.35rem; }
+  .label { font-size:12px; font-family:var(--mono); color:var(--ink); letter-spacing:0.08em; text-transform:uppercase; font-weight:500; display:block; margin-bottom:0.5rem; }
+  .sel-wrap { position:relative; }
+  select { width:100%; background:var(--surface2); color:var(--ink); border:1.5px solid var(--border); border-radius:10px; padding:0.85rem 2.5rem 0.85rem 1rem; font-family:var(--font); font-size:15px; font-weight:600; appearance:none; cursor:pointer; outline:none; transition:border-color 0.15s; }
+  select.empty { color:var(--muted); font-weight:500; }
+  select:focus { border-color:var(--ink); background:var(--surface); }
+  .arr { position:absolute; right:1rem; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--ink-soft); font-size:12px; }
+  .sep { height:1.5px; background:var(--border); }
+
+  /* LLM BUTTONS */
+  .llm-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.15rem; }
+  .llm-btn { display:flex; align-items:center; justify-content:center; padding:1.35rem 1rem; border-radius:10px; cursor:pointer; font-family:var(--mono); font-size:18px; font-weight:500; transition:all 0.15s; border:1.5px solid; position:relative; overflow:hidden; }
+  .llm-btn:not([disabled]):hover { transform:translateY(-2px); }
+  .llm-btn:not([disabled]):active { transform:scale(0.98); }
+
+  .llm-btn.claude { background:var(--dark); border-color:var(--dark-border); color:var(--dark-text); }
+  .llm-btn.claude::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent); }
+  .llm-btn.claude:not([disabled]):hover { background:var(--dark-soft); box-shadow:0 6px 18px rgba(22,21,15,0.22); }
+
+  .llm-btn.chatgpt { background:var(--surface2); border-color:var(--border-strong); color:var(--ink); }
+  .llm-btn.chatgpt:not([disabled]):hover { background:var(--surface); border-color:var(--ink); box-shadow:0 6px 12px rgba(22,21,15,0.09); }
+
+  /* disabled lisible */
+  .llm-btn[disabled].claude { background:#1e201a; border-color:#1e201a; color:#4a4d44; }
+  .llm-btn[disabled].claude::before { opacity:0.15; }
+  .llm-btn[disabled].chatgpt { color:var(--muted); border-color:var(--border); cursor:not-allowed; }
+
+  /* STATES */
+  .state { display:none; }
+  .state.on { display:flex; }
+  .loading { align-items:center; gap:0.75rem; padding:1rem; background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; }
+  .spinner { width:16px; height:16px; border:2px solid var(--border-strong); border-top-color:var(--ink); border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-txt { font-size:14px; font-family:var(--mono); color:var(--ink-soft); }
+
+  .success { flex-direction:column; gap:0.6rem; padding:1.25rem; background:var(--dark); border:1.5px solid var(--dark-border); border-radius:10px; position:relative; overflow:hidden; }
+  .success::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent); }
+  .s-row { display:flex; align-items:center; justify-content:space-between; gap:0.75rem; }
+  .s-label { font-size:11px; font-family:var(--mono); color:var(--accent); letter-spacing:0.15em; text-transform:uppercase; }
+  .s-name { font-size:16px; font-weight:700; color:var(--dark-text); font-family:var(--mono); }
+  .copy-btn { background:var(--accent); color:var(--dark); border:none; border-radius:8px; padding:0.5rem 0.9rem; font-family:var(--mono); font-size:12px; font-weight:600; cursor:pointer; flex-shrink:0; transition:opacity 0.15s; }
+  .copy-btn:hover { opacity:0.85; }
+  .paste-hint { font-size:12px; font-family:var(--mono); color:var(--dark-muted); }
+  .k { background:var(--dark-border); color:var(--dark-text); padding:0.1rem 0.4rem; border-radius:4px; font-size:11px; }
+
+  .error-state { display:none; padding:0.9rem 1rem; border:1.5px solid var(--border-strong); border-radius:10px; font-size:13px; font-family:var(--mono); color:var(--ink-soft); }
+  .error-state.on { display:block; }
+
+  .footer { display:flex; align-items:center; justify-content:center; gap:0.5rem; }
+  .footer-text { font-size:11px; font-family:var(--mono); color:var(--muted); }
+  .dot { width:5px; height:5px; border-radius:50%; background:var(--accent-deep); animation:pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(.6)}}
+
+  .wrap > * { opacity:0; transform:translateY(8px); animation:up 0.3s ease forwards; }
+  .wrap > :nth-child(1){animation-delay:.04s} .wrap > :nth-child(2){animation-delay:.09s}
+  .wrap > :nth-child(3){animation-delay:.14s} .wrap > :nth-child(4){animation-delay:.18s}
+  @keyframes up{to{opacity:1;transform:translateY(0)}}
+  @media(max-width:360px){.llm-grid{grid-template-columns:1fr}}
+  @media(max-width:600px){ html{padding:0} body{border-radius:0; min-height:100vh} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div>
+    <a href="./index.html" class="back">← Retour</a>
+    <span class="kcp-tag">KCP — Knowledge Context Protocol</span>
+    <h1 class="page-title">Initialiser une IA</h1>
+  </div>
+
+  <div class="card">
+    <div>
+      <span class="label">Tiroir</span>
+      <div class="sel-wrap">
+        <select id="sel" class="empty" onchange="onChange()">
+          <option value="">— choisir un tiroir —</option>
+        </select>
+        <span class="arr">▾</span>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div>
+      <span class="label">Ouvrir dans</span>
+      <div class="llm-grid">
+        <button class="llm-btn claude" id="btn-claude" onclick="launch('claude')" disabled>Claude</button>
+        <button class="llm-btn chatgpt" id="btn-chatgpt" onclick="launch('chatgpt')" disabled>ChatGPT</button>
+      </div>
+    </div>
+
+    <div class="state loading" id="s-loading">
+      <div class="spinner"></div>
+      <span class="loading-txt">Chargement du prompt…</span>
+    </div>
+
+    <div class="state success" id="s-success">
+      <div class="s-row">
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <span class="s-label">Prompt copié ✓</span>
+          <span class="s-name" id="s-tiroir"></span>
+        </div>
+        <button class="copy-btn" id="copy-again" onclick="copyAgain()">Copier à nouveau</button>
+      </div>
+      <span class="paste-hint"><span class="k">⌘V</span> ou <span class="k">Ctrl+V</span> dans le champ de l'IA</span>
+    </div>
+
+    <div class="error-state" id="s-error"></div>
+  </div>
+
+  <div class="footer"><div class="dot"></div><span class="footer-text">système actif · KCP V2</span></div>
+
+</div>
+<script>
+  const C = KCP_CONFIG;
+  let prompt = '';
+  const sel = document.getElementById('sel');
+
+  async function loadTiroirs() {
+    try {
+      const r = await fetch(C.webhooks.tiroirs, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({client_id:C.client_id}) });
+      const list = await r.json();
+      list.forEach(t => { const o=document.createElement('option'); o.value=t.nom_tiroir; o.textContent='#'+t.nom_tiroir; sel.appendChild(o); });
+    } catch(e) { console.warn('Tiroirs unavailable'); }
+  }
+
+  function onChange() {
+    const has = !!sel.value;
+    sel.classList.toggle('empty', !has);
+    document.getElementById('btn-claude').disabled = !has;
+    document.getElementById('btn-chatgpt').disabled = !has;
+    hideAll();
+  }
+
+  async function launch(llm) {
+    if (!sel.value) return;
+    hideAll(); show('s-loading');
+    try {
+      const r = await fetch(C.webhooks.prompt, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({client_id:C.client_id, nom_tiroir:sel.value}) });
+      const d = await r.json();
+      const raw = d.prompt || d.content || d.text || '';
+      prompt = raw ? decodeURIComponent(escape(atob(raw))) : '';
+      await copy(prompt);
+      hide('s-loading');
+      document.getElementById('s-tiroir').textContent = '#' + sel.value;
+      show('s-success');
+      window.open(llm==='claude'?'https://claude.ai/new':'https://chatgpt.com/', '_blank');
+    } catch(e) { hide('s-loading'); showErr('Erreur lors du chargement. Réessaie.'); }
+  }
+
+  async function copy(t) { try { await navigator.clipboard.writeText(t); } catch { const a=document.createElement('textarea'); a.value=t; document.body.appendChild(a); a.select(); document.execCommand('copy'); document.body.removeChild(a); } }
+  async function copyAgain() { const b=document.getElementById('copy-again'); await copy(prompt); b.textContent='Copié ✓'; setTimeout(()=>b.textContent='Copier à nouveau',1800); }
+  function show(id) { document.getElementById(id).classList.add('on'); }
+  function hide(id) { document.getElementById(id).classList.remove('on'); }
+  function hideAll() { ['s-loading','s-success'].forEach(hide); document.getElementById('s-error').classList.remove('on'); }
+  function showErr(m) { const e=document.getElementById('s-error'); e.textContent=m; e.classList.add('on'); }
+
+  loadTiroirs();
+</script>
+</body>
+</html>
