@@ -11,14 +11,14 @@
   :root {
     --bg:#f6f4ee; --surface:#ffffff; --surface2:#efece2;
     --border:#d3cebd; --border-strong:#b8b2a0;
-    --ink:#16150f; --ink-soft:#3d3b30; --muted:#6c6857;
+    --ink:#16150f; --ink-soft:#3d3b30; --muted:#524e3e;
     --accent:#c8f55a; --accent-deep:#4d6b14;
     --dark:#14160f; --dark-soft:#1d2016; --dark-border:#2c2f22;
     --dark-text:#eef0e5; --dark-muted:#9aa088;
     --font:'Syne',sans-serif; --mono:'DM Mono',monospace;
   }
-  html, body { height:100%; background:var(--bg); color:var(--ink); font-family:var(--font); }
-  body { display:flex; flex-direction:column; height:100vh; max-width:480px; margin:0 auto; }
+  html { background:#14160f; min-height:100vh; padding:0 1.5rem; }
+  body { background:var(--bg); color:var(--ink); font-family:var(--font);  display:flex; flex-direction:column; height:100vh; max-width:520px; margin:0 auto; }
 
   /* HEADER */
   .header { padding:0.8rem 1.1rem; border-bottom:1.5px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; background:var(--surface); }
@@ -107,6 +107,7 @@
   .send:active { transform:scale(0.94); }
   .send:disabled { opacity:0.3; cursor:default; transform:none; }
   .send svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+  @media(max-width:600px){ html{padding:0} body{border-radius:0; height:100vh} }
 </style>
 </head>
 <body>
