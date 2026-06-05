@@ -9,529 +9,282 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #222222;
-    --border: #2e2e2e; --border-hover: #444;
-    --text: #f0ede8; --text-muted: #888; --text-dim: #555;
-    --accent: #c8f55a;
-    --accent-dim: rgba(200,245,90,0.10); --accent-border: rgba(200,245,90,0.25);
-    --blue: #64b4ff; --blue-dim: rgba(100,180,255,0.10); --blue-border: rgba(100,180,255,0.25);
-    --purple: #b478ff; --purple-dim: rgba(180,120,255,0.10); --purple-border: rgba(180,120,255,0.25);
-    --font-display: 'Syne', sans-serif; --font-mono: 'DM Mono', monospace;
+    --bg:#f6f4ee; --surface:#ffffff; --surface2:#efece2;
+    --border:#d3cebd; --border-strong:#b8b2a0;
+    --ink:#16150f; --ink-soft:#3d3b30; --muted:#6c6857;
+    --accent:#c8f55a; --accent-deep:#4d6b14;
+    --dark:#14160f; --dark-soft:#1d2016; --dark-border:#2c2f22;
+    --dark-text:#eef0e5; --dark-muted:#9aa088;
+    --font:'Syne',sans-serif; --mono:'DM Mono',monospace;
   }
-  html, body { height: 100%; }
-  body {
-    background: var(--bg); color: var(--text); font-family: var(--font-display);
-    display: flex; flex-direction: column; height: 100vh;
-    max-width: 480px; margin: 0 auto;
-  }
-
-  /* BACK LINK */
-  .back-link {
-    display: inline-flex; align-items: center; gap: 0.3rem;
-    font-size: 10px; font-family: var(--font-mono); color: var(--text-dim);
-    text-decoration: none; margin-bottom: 3px;
-    transition: color 0.15s;
-  }
-  .back-link:hover { color: var(--text-muted); }
+  html, body { height:100%; background:var(--bg); color:var(--ink); font-family:var(--font); }
+  body { display:flex; flex-direction:column; height:100vh; max-width:480px; margin:0 auto; }
 
   /* HEADER */
-  .header {
-    padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    flex-shrink: 0; background: var(--surface);
-  }
-  .header-left { display: flex; flex-direction: column; gap: 2px; }
-  .logo-badge { font-size: 9px; font-family: var(--font-mono); color: var(--accent); letter-spacing: 0.18em; text-transform: uppercase; }
-  .header-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
-  .tiroir-pill {
-    display: flex; align-items: center; gap: 6px;
-    padding: 0.28rem 0.75rem; border: 1px solid var(--accent-border);
-    background: var(--accent-dim); border-radius: 100px;
-    font-size: 11px; font-family: var(--font-mono); color: var(--accent);
-    cursor: pointer; transition: background 0.12s;
-  }
-  .tiroir-pill:hover { background: rgba(200,245,90,0.16); }
-  .pulse-dot {
-    width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0;
-    animation: pulse 2.2s ease-in-out infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.8)} }
+  .header { padding:0.8rem 1.1rem; border-bottom:1.5px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; background:var(--surface); }
+  .hdr-left { display:flex; flex-direction:column; gap:2px; }
+  .back { font-size:12px; font-family:var(--mono); color:var(--muted); text-decoration:none; font-weight:500; transition:color 0.15s; }
+  .back:hover { color:var(--ink); }
+  .hdr-title { font-size:16px; font-weight:700; letter-spacing:-0.01em; color:var(--ink); font-family:var(--mono); }
+  .tiroir-pill { display:flex; align-items:center; gap:6px; padding:0.3rem 0.8rem; border:1.5px solid var(--border-strong); background:var(--surface2); border-radius:100px; font-size:12px; font-family:var(--mono); color:var(--ink-soft); cursor:pointer; transition:all 0.12s; font-weight:500; }
+  .tiroir-pill:hover { background:var(--surface); border-color:var(--ink); color:var(--ink); }
+  .pulse { width:5px; height:5px; border-radius:50%; background:var(--accent-deep); flex-shrink:0; animation:pulse 2.2s ease-in-out infinite; }
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.7)}}
 
-  /* TIROIR CHIPS */
-  .tiroir-row {
-    display: flex; gap: 6px; padding: 0.55rem 1.25rem;
-    border-bottom: 1px solid var(--border); overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
-  }
-  .tiroir-row::-webkit-scrollbar { display: none; }
-  .chip {
-    flex-shrink: 0; padding: 0.28rem 0.7rem; border-radius: 100px;
-    border: 1px solid var(--border); background: transparent;
-    color: var(--text-dim); font-size: 11px; font-family: var(--font-mono);
-    cursor: pointer; transition: all 0.12s; white-space: nowrap;
-  }
-  .chip:hover { border-color: var(--border-hover); color: var(--text-muted); }
-  .chip.active { border-color: var(--accent-border); background: var(--accent-dim); color: var(--accent); }
+  /* CHIPS */
+  .chips { display:flex; gap:5px; padding:0.5rem 1.1rem; border-bottom:1.5px solid var(--border); overflow-x:auto; flex-shrink:0; scrollbar-width:none; background:var(--bg); }
+  .chips::-webkit-scrollbar { display:none; }
+  .chip { flex-shrink:0; padding:0.28rem 0.75rem; border-radius:100px; border:1.5px solid var(--border); background:var(--surface); color:var(--muted); font-size:12px; font-family:var(--mono); font-weight:500; cursor:pointer; transition:all 0.12s; white-space:nowrap; }
+  .chip:hover { border-color:var(--border-strong); color:var(--ink-soft); }
+  .chip.on { border-color:var(--dark); background:var(--dark); color:var(--dark-text); }
 
   /* MESSAGES */
-  .messages {
-    flex: 1; overflow-y: auto; padding: 1.25rem 1.25rem 0.5rem;
-    display: flex; flex-direction: column; gap: 0.75rem; scroll-behavior: smooth;
-  }
-  .messages::-webkit-scrollbar { width: 3px; }
-  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-  .day-sep { text-align: center; font-size: 10px; font-family: var(--font-mono); color: var(--text-dim); margin: 0.25rem 0; }
-  .msg { display: flex; flex-direction: column; max-width: 84%; }
-  .msg.user { align-self: flex-end; align-items: flex-end; }
-  .msg.ai { align-self: flex-start; align-items: flex-start; }
-  .msg-tag {
-    font-size: 9px; font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 1px 7px; border-radius: 4px; margin-bottom: 4px;
-  }
-  .msg-tag.capture { color: var(--blue); background: var(--blue-dim); border: 1px solid var(--blue-border); }
-  .msg-tag.demande { color: var(--purple); background: var(--purple-dim); border: 1px solid var(--purple-border); }
-  .msg-tag.systeme { color: var(--accent); background: var(--accent-dim); border: 1px solid var(--accent-border); }
-  .bubble { padding: 0.65rem 0.9rem; border-radius: 14px; font-size: 14px; line-height: 1.55; }
-  .msg.user .bubble { background: var(--accent-dim); border: 1px solid var(--accent-border); color: var(--text); border-bottom-right-radius: 4px; }
-  .msg.ai .bubble { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
-  .msg-time { font-size: 10px; font-family: var(--font-mono); color: var(--text-dim); margin-top: 3px; padding: 0 4px; }
+  .msgs { flex:1; overflow-y:auto; padding:1rem 1.1rem 0.5rem; display:flex; flex-direction:column; gap:0.7rem; scroll-behavior:smooth; }
+  .msgs::-webkit-scrollbar { width:3px; }
+  .msgs::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+  .msg { display:flex; flex-direction:column; max-width:85%; }
+  .msg.user { align-self:flex-end; align-items:flex-end; }
+  .msg.ai { align-self:flex-start; align-items:flex-start; }
+
+  .msg-tag { font-size:10px; font-family:var(--mono); letter-spacing:0.08em; text-transform:uppercase; padding:2px 7px; border-radius:4px; margin-bottom:4px; border:1px solid; }
+  .msg-tag.capture { color:var(--accent-deep); background:rgba(77,107,20,0.10); border-color:rgba(77,107,20,0.25); }
+  .msg-tag.demande { color:var(--ink-soft); background:rgba(22,21,15,0.07); border-color:rgba(22,21,15,0.18); }
+  .msg-tag.systeme { color:var(--muted); background:transparent; border-color:var(--border); }
+
+  .bubble { padding:0.65rem 0.9rem; border-radius:12px; font-size:14px; line-height:1.55; }
+  .msg.user .bubble { background:var(--dark); color:var(--dark-text); border-bottom-right-radius:3px; }
+  .msg.ai .bubble { background:var(--surface); border:1.5px solid var(--border); color:var(--ink); border-bottom-left-radius:3px; }
+  .msg-time { font-size:10px; font-family:var(--mono); color:var(--muted); margin-top:3px; padding:0 3px; }
 
   /* TYPING */
-  .typing-indicator {
-    display: flex; align-items: center; gap: 4px;
-    padding: 0.65rem 0.9rem; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; border-bottom-left-radius: 4px; align-self: flex-start; margin-bottom: 0.25rem;
-  }
-  .td { width: 5px; height: 5px; border-radius: 50%; background: var(--text-dim); animation: blink 1.2s ease-in-out infinite; }
-  .td:nth-child(2) { animation-delay: 0.2s; }
-  .td:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+  .typing { display:flex; align-items:center; gap:4px; padding:0.65rem 0.9rem; background:var(--surface); border:1.5px solid var(--border); border-radius:12px; border-bottom-left-radius:3px; align-self:flex-start; }
+  .td { width:5px; height:5px; border-radius:50%; background:var(--muted); animation:blink 1.2s ease-in-out infinite; }
+  .td:nth-child(2){animation-delay:.2s} .td:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
 
-  /* LOADING HISTORY */
-  .history-loading {
-    text-align: center; font-size: 10px; font-family: var(--font-mono);
-    color: var(--text-dim); padding: 0.5rem 0;
-  }
+  .hist-loading { text-align:center; font-size:11px; font-family:var(--mono); color:var(--muted); padding:0.5rem 0; }
 
   /* COMMAND MENU */
-  .cmd-menu {
-    display: none; flex-direction: column; flex-shrink: 0;
-    margin: 0 1.25rem 0; background: var(--surface);
-    border: 1px solid var(--border); border-radius: 12px;
-    overflow: hidden;
-  }
-  .cmd-menu.open { display: flex; }
-  .cmd-menu-header {
-    padding: 0.45rem 0.9rem;
-    font-size: 9px; font-family: var(--font-mono); color: var(--text-dim);
-    letter-spacing: 0.12em; text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
-  }
-  .cmd-option {
-    display: flex; align-items: center; gap: 0.85rem;
-    padding: 0.7rem 0.9rem; background: transparent; border: none;
-    cursor: pointer; text-align: left; transition: background 0.1s; width: 100%;
-    border-top: 1px solid var(--border);
-  }
-  .cmd-option:first-of-type { border-top: none; }
-  .cmd-option:hover { background: var(--surface2); }
-  .cmd-icon {
-    width: 30px; height: 30px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-mono); font-size: 13px; font-weight: 500; flex-shrink: 0;
-  }
-  .cmd-icon.capture { background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue-border); }
-  .cmd-icon.demande { background: var(--purple-dim); color: var(--purple); border: 1px solid var(--purple-border); }
-  .cmd-text { display: flex; flex-direction: column; gap: 1px; }
-  .cmd-name { font-size: 13px; font-family: var(--font-mono); font-weight: 500; }
-  .cmd-name.capture { color: var(--blue); }
-  .cmd-name.demande { color: var(--purple); }
-  .cmd-desc { font-size: 11px; font-family: var(--font-mono); color: var(--text-dim); }
+  .cmd { display:none; flex-direction:column; flex-shrink:0; margin:0 1.1rem 0; background:var(--surface); border:1.5px solid var(--border); border-radius:12px; overflow:hidden; }
+  .cmd.open { display:flex; }
+  .cmd-hdr { padding:0.4rem 0.9rem; font-size:10px; font-family:var(--mono); color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; border-bottom:1px solid var(--border); }
+  .cmd-opt { display:flex; align-items:center; gap:0.85rem; padding:0.75rem 0.9rem; background:transparent; border:none; cursor:pointer; text-align:left; transition:background 0.1s; width:100%; border-top:1px solid var(--border); }
+  .cmd-opt:first-of-type { border-top:none; }
+  .cmd-opt:hover { background:var(--surface2); }
+  .cmd-ico { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:11px; font-weight:500; flex-shrink:0; }
+  .cmd-ico.capture { background:rgba(77,107,20,0.10); color:var(--accent-deep); border:1.5px solid rgba(77,107,20,0.25); }
+  .cmd-ico.demande { background:rgba(22,21,15,0.07); color:var(--ink-soft); border:1.5px solid rgba(22,21,15,0.18); }
+  .cmd-txt { display:flex; flex-direction:column; gap:1px; }
+  .cmd-name { font-size:14px; font-family:var(--mono); font-weight:500; color:var(--ink); }
+  .cmd-desc { font-size:12px; font-family:var(--mono); color:var(--muted); }
 
   /* INPUT AREA */
-  .input-area {
-    padding: 0.85rem 1.25rem; border-top: 1px solid var(--border);
-    display: flex; gap: 0.6rem; align-items: flex-end; flex-shrink: 0; background: var(--bg);
-  }
-  .slash-btn {
-    width: 38px; height: 38px; flex-shrink: 0;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-mono); font-size: 16px; font-weight: 500; color: var(--text-dim);
-    transition: all 0.12s; line-height: 1;
-  }
-  .slash-btn:hover { border-color: var(--border-hover); color: var(--text-muted); }
-  .slash-btn.active { border-color: var(--border-hover); color: var(--text); background: var(--surface2); }
-  .slash-btn.mode-capture { border-color: var(--blue-border); background: var(--blue-dim); color: var(--blue); }
-  .slash-btn.mode-demande { border-color: var(--purple-border); background: var(--purple-dim); color: var(--purple); }
+  .inp-area { padding:0.75rem 1.1rem; border-top:1.5px solid var(--border); display:flex; gap:0.55rem; align-items:flex-end; flex-shrink:0; background:var(--surface); }
 
-  .input-wrap {
-    flex: 1; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; display: flex; align-items: flex-end;
-    padding: 0 0.85rem; transition: border-color 0.15s; gap: 0.5rem;
-  }
-  .input-wrap:focus-within { border-color: var(--accent-border); }
-  .input-wrap.mode-capture:focus-within { border-color: var(--blue-border); }
-  .input-wrap.mode-demande:focus-within { border-color: var(--purple-border); }
+  .slash-btn { width:38px; height:38px; flex-shrink:0; background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:15px; font-weight:500; color:var(--ink-soft); transition:all 0.12s; }
+  .slash-btn:hover { border-color:var(--border-strong); color:var(--ink); }
+  .slash-btn.active { border-color:var(--ink); background:var(--surface); color:var(--ink); }
+  .slash-btn.m-cap { border-color:rgba(77,107,20,0.5); background:rgba(77,107,20,0.10); color:var(--accent-deep); }
+  .slash-btn.m-dem { border-color:var(--border-strong); background:var(--dark); color:var(--dark-text); }
 
-  .mode-chip {
-    display: none; align-items: center; gap: 4px;
-    padding: 2px 6px; border-radius: 5px; margin: 0.7rem 0 0.7rem -0.15rem;
-    font-size: 9px; font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase;
-    flex-shrink: 0; cursor: default;
-  }
-  .mode-chip.capture { color: var(--blue); background: var(--blue-dim); border: 1px solid var(--blue-border); }
-  .mode-chip.demande { color: var(--purple); background: var(--purple-dim); border: 1px solid var(--purple-border); }
-  .mode-chip.visible { display: flex; }
-  .chip-clear { background: none; border: none; cursor: pointer; color: inherit; opacity: 0.55; font-size: 12px; line-height: 1; padding: 0; }
-  .chip-clear:hover { opacity: 1; }
+  .inp-wrap { flex:1; background:var(--surface2); border:1.5px solid var(--border); border-radius:12px; display:flex; align-items:flex-end; padding:0 0.85rem; transition:border-color 0.15s; gap:0.5rem; }
+  .inp-wrap:focus-within { border-color:var(--ink); background:var(--surface); }
+  .inp-wrap.m-cap:focus-within { border-color:rgba(77,107,20,0.6); }
 
-  textarea {
-    flex: 1; background: transparent; border: none; outline: none;
-    color: var(--text); font-family: var(--font-display); font-size: 14px;
-    resize: none; padding: 0.7rem 0; line-height: 1.45; max-height: 90px;
-  }
-  textarea::placeholder { color: var(--text-dim); }
+  .mode-tag { display:none; align-items:center; gap:4px; padding:2px 6px; border-radius:5px; margin:0.7rem 0 0.7rem -0.1rem; font-size:10px; font-family:var(--mono); letter-spacing:0.08em; text-transform:uppercase; flex-shrink:0; }
+  .mode-tag.capture { color:var(--accent-deep); background:rgba(77,107,20,0.10); border:1px solid rgba(77,107,20,0.25); }
+  .mode-tag.demande { color:var(--dark-text); background:var(--dark); border:1px solid var(--dark-border); }
+  .mode-tag.vis { display:flex; }
+  .tag-x { background:none; border:none; cursor:pointer; color:inherit; opacity:0.55; font-size:13px; line-height:1; padding:0; }
+  .tag-x:hover { opacity:1; }
 
-  .send-btn {
-    width: 38px; height: 38px; background: var(--accent); border: none;
-    border-radius: 10px; cursor: pointer; display: flex; align-items: center;
-    justify-content: center; flex-shrink: 0; color: #0f0f0f;
-    transition: opacity 0.15s, transform 0.1s;
-  }
-  .send-btn:hover { opacity: 0.88; }
-  .send-btn:active { transform: scale(0.94); }
-  .send-btn:disabled { opacity: 0.25; cursor: default; transform: none; }
-  .send-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  textarea { flex:1; background:transparent; border:none; outline:none; color:var(--ink); font-family:var(--font); font-size:14px; resize:none; padding:0.7rem 0; line-height:1.45; max-height:90px; }
+  textarea::placeholder { color:var(--muted); }
+
+  .send { width:38px; height:38px; background:var(--dark); border:none; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--accent); transition:opacity 0.15s, transform 0.1s; }
+  .send:hover { opacity:0.85; }
+  .send:active { transform:scale(0.94); }
+  .send:disabled { opacity:0.3; cursor:default; transform:none; }
+  .send svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-left">
-    <a href="./index.html" class="back-link">← Accueil</a>
-    <span class="logo-badge" id="logo-badge">KCP · … · …</span>
-    <span class="header-title">Mémoire Digitale</span>
+  <div class="hdr-left">
+    <a href="./index.html" class="back">← Accueil</a>
+    <span class="hdr-title">Chat mémoire</span>
   </div>
   <div class="tiroir-pill" onclick="toggleChips()">
-    <div class="pulse-dot"></div>
-    <span id="active-label">#kcp</span>
+    <div class="pulse"></div>
+    <span id="active-label">#…</span>
     <span style="font-size:10px;opacity:0.5">▾</span>
   </div>
 </div>
 
-<div class="tiroir-row" id="tiroir-row">
-  <!-- chips chargées dynamiquement -->
+<div class="chips" id="chips"></div>
+
+<div class="msgs" id="msgs">
+  <div class="hist-loading" id="hist-load">chargement de l'historique…</div>
 </div>
 
-<div class="messages" id="messages">
-  <div class="history-loading" id="history-loading">chargement de l'historique…</div>
-</div>
-
-<!-- Command menu -->
-<div class="cmd-menu" id="cmd-menu">
-  <div class="cmd-menu-header">Choisir un mode</div>
-  <button class="cmd-option" onclick="setMode('capture')">
-    <div class="cmd-icon capture">/cap</div>
-    <div class="cmd-text">
-      <span class="cmd-name capture">/capture</span>
+<div class="cmd" id="cmd">
+  <div class="cmd-hdr">Choisir un mode</div>
+  <button class="cmd-opt" onclick="setMode('capture')">
+    <div class="cmd-ico capture">cap</div>
+    <div class="cmd-txt">
+      <span class="cmd-name">/capture</span>
       <span class="cmd-desc">Enregistrer une info dans ta mémoire</span>
     </div>
   </button>
-  <button class="cmd-option" onclick="setMode('demande')">
-    <div class="cmd-icon demande">/dem</div>
-    <div class="cmd-text">
-      <span class="cmd-name demande">/demande</span>
+  <button class="cmd-opt" onclick="setMode('demande')">
+    <div class="cmd-ico demande">dem</div>
+    <div class="cmd-txt">
+      <span class="cmd-name">/demande</span>
       <span class="cmd-desc">Poser une question à ta mémoire</span>
     </div>
   </button>
 </div>
 
-<div class="input-area">
-  <button class="slash-btn" id="slash-btn" onclick="toggleMenu()">/</button>
-  <div class="input-wrap" id="input-wrap">
-    <span class="mode-chip" id="mode-chip">
-      <span id="mode-chip-label"></span>
-      <button class="chip-clear" onclick="clearMode()" title="Désactiver le mode">×</button>
+<div class="inp-area">
+  <button class="slash-btn" id="slash" onclick="toggleMenu()">/</button>
+  <div class="inp-wrap" id="inp-wrap">
+    <span class="mode-tag" id="mode-tag">
+      <span id="mode-tag-lbl"></span>
+      <button class="tag-x" onclick="clearMode()">×</button>
     </span>
-    <textarea id="inp" rows="1" placeholder="Capture une info ou pose une question…" onkeydown="handleKey(event)"></textarea>
+    <textarea id="inp" rows="1" placeholder="Capture ou pose une question…" onkeydown="handleKey(event)"></textarea>
   </div>
-  <button class="send-btn" id="send-btn" onclick="send()">
+  <button class="send" id="send" onclick="doSend()">
     <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
   </button>
 </div>
 
 <script>
-  const ID_CLIENT        = KCP_CONFIG.client_id;
-  const WEBHOOK          = KCP_CONFIG.webhooks.chat;
-  const WEBHOOK_HIS      = KCP_CONFIG.webhooks.history;
-  const WEBHOOK_TIROIRS  = KCP_CONFIG.webhooks.tiroirs;
+  const C = KCP_CONFIG;
+  let tiroir = null, mode = null, menuOpen = false, chipsVis = true;
+  const inp = document.getElementById('inp');
+  const msgs = document.getElementById('msgs');
+  const cmd = document.getElementById('cmd');
+  const slash = document.getElementById('slash');
+  const modeTag = document.getElementById('mode-tag');
+  const modeTagLbl = document.getElementById('mode-tag-lbl');
+  const inpWrap = document.getElementById('inp-wrap');
 
-  let activeTiroir = null;
-  let activeMode   = null;
-  let menuOpen     = false;
-  let chipsVisible = true;
-
-  const inp           = document.getElementById('inp');
-  const slashBtn      = document.getElementById('slash-btn');
-  const modeChip      = document.getElementById('mode-chip');
-  const modeChipLabel = document.getElementById('mode-chip-label');
-  const inputWrap     = document.getElementById('input-wrap');
-  const cmdMenu       = document.getElementById('cmd-menu');
-  const sendBtn       = document.getElementById('send-btn');
-  const messagesEl    = document.getElementById('messages');
-
-  /* ── TIROIRS DYNAMIQUES ── */
   async function loadTiroirs() {
     try {
-      const res = await fetch(WEBHOOK_TIROIRS, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ client_id: ID_CLIENT }),
+      const r = await fetch(C.webhooks.tiroirs, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({client_id:C.client_id}) });
+      const list = await r.json();
+      const row = document.getElementById('chips'); row.innerHTML = '';
+      list.forEach((t,i) => {
+        const b = document.createElement('button'); b.className='chip'+(i===0?' on':''); b.dataset.t=t.nom_tiroir;
+        b.textContent='#'+t.nom_tiroir;
+        b.addEventListener('click',()=>selectTiroir(t.nom_tiroir,b));
+        row.appendChild(b);
+        if(i===0){ tiroir=t.nom_tiroir; document.getElementById('active-label').textContent='#'+t.nom_tiroir; }
       });
-      const tiroirs = await res.json();
-      const row = document.getElementById('tiroir-row');
-      row.innerHTML = '';
-
-      tiroirs.forEach((t, i) => {
-        const name = t.nom_tiroir;
-        const btn = document.createElement('button');
-        btn.className = 'chip' + (i === 0 ? ' active' : '');
-        btn.dataset.t = name;
-        btn.textContent = '#' + name;
-        btn.addEventListener('click', () => selectTiroir(name, btn));
-        row.appendChild(btn);
-        if (i === 0) {
-          activeTiroir = name;
-          document.getElementById('active-label').textContent = '#' + name;
-        }
-      });
-    } catch (e) {
-      // Fallback silencieux — tiroir par défaut
-      activeTiroir = 'kcp';
-      document.getElementById('active-label').textContent = '#kcp';
-      const row = document.getElementById('tiroir-row');
-      row.innerHTML = '<button class="chip active" data-t="kcp">#kcp</button>';
+    } catch(e) {
+      tiroir='kcp'; document.getElementById('active-label').textContent='#kcp';
+      const row=document.getElementById('chips'); row.innerHTML='<button class="chip on" data-t="kcp">#kcp</button>';
     }
   }
 
   function selectTiroir(name, btn) {
-    document.querySelector('.chip.active')?.classList.remove('active');
-    btn.classList.add('active');
-    activeTiroir = name;
-    document.getElementById('active-label').textContent = '#' + name;
-    addSystemMsg(`Tiroir <strong>#${name}</strong> actif.`);
+    document.querySelector('.chip.on')?.classList.remove('on');
+    btn.classList.add('on'); tiroir=name;
+    document.getElementById('active-label').textContent='#'+name;
+    sysMsg('Tiroir <strong>#'+name+'</strong> actif.');
     scrollDown();
   }
 
-  /* ── FORMAT TIMESTAMP ── */
   function fmtTime(ts) {
-    if (!ts) return '';
-    try {
-      const d = new Date(ts);
-      return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
-        + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    } catch { return ''; }
+    if(!ts) return '';
+    try { const d=new Date(ts); return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); } catch{ return ''; }
   }
 
-  /* ── LOAD HISTORY ── */
   async function loadHistory() {
     try {
-      const res = await fetch(WEBHOOK_HIS, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_client: ID_CLIENT }),
-      });
-      const raw = await res.text();
-      const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+      const r = await fetch(C.webhooks.history, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id_client:C.client_id}) });
+      const raw = await r.text();
+      const cleaned = raw.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
       const data = JSON.parse(cleaned);
-
-      document.getElementById('history-loading')?.remove();
-
-      if (!data.h || data.h.length === 0) {
-        addSystemMsg('Aucun historique. Utilise <strong>/</strong> pour commencer.');
-        return;
-      }
-
-      // Newest-first from Make → reverse pour affichage chrono
-      const rows = [...data.h].reverse();
-
-      rows.forEach(row => {
-        const tiroir  = row.t || '';
-        const mode    = row.m || 'demande';
-        const message = decodeURIComponent(row.q || '');
-        const reponse = decodeURIComponent(row.r || '');
-        const ts      = fmtTime(row.ts);
-
-        // Message utilisateur
-        addMsgWithTime('user', message.replace(/\n/g, '<br>'), null, null, ts);
-
-        // Réponse IA — strip backticks + parse JSON si besoin
-        let displayText = reponse;
-        try {
-          const stripped = reponse.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-          const parsed = JSON.parse(stripped);
-          displayText = parsed.text || reponse;
-        } catch { /* texte brut, on affiche tel quel */ }
-
-        // Tag tiroir + mode
-        const tagLabel = tiroir ? mode + ' · #' + tiroir : mode;
-        addMsgWithTime('ai', displayText, tagLabel, mode, ts);
+      document.getElementById('hist-load')?.remove();
+      if(!data.h||data.h.length===0){ sysMsg('Aucun historique. Utilise <strong>/</strong> pour commencer.'); return; }
+      [...data.h].reverse().forEach(row => {
+        const m=row.m||'demande', q=decodeURIComponent(row.q||''), rep=decodeURIComponent(row.r||''), ts=fmtTime(row.ts);
+        addMsgT('user',q.replace(/\n/g,'<br>'),null,null,ts);
+        let txt=rep; try{ const s=rep.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim(); txt=JSON.parse(s).text||rep; }catch{}
+        addMsgT('ai',txt,(row.t?m+' · #'+row.t:m),m,ts);
       });
-
       scrollDown();
-    } catch (e) {
-      document.getElementById('history-loading')?.remove();
-      addSystemMsg('Historique indisponible.');
+    } catch(e) {
+      document.getElementById('hist-load')?.remove();
+      sysMsg('Historique indisponible. Utilise <strong>/</strong> pour commencer.');
     }
   }
 
-  /* ── TOGGLE CHIPS ── */
   function toggleChips() {
-    const row = document.getElementById('tiroir-row');
-    chipsVisible = !chipsVisible;
-    row.style.display = chipsVisible ? 'flex' : 'none';
+    const row=document.getElementById('chips'); chipsVis=!chipsVis; row.style.display=chipsVis?'flex':'none';
   }
 
-  /* ── COMMAND MENU ── */
   function toggleMenu() {
-    menuOpen = !menuOpen;
-    cmdMenu.classList.toggle('open', menuOpen);
-    slashBtn.classList.toggle('active', menuOpen);
-    if (menuOpen) scrollDown();
+    menuOpen=!menuOpen; cmd.classList.toggle('open',menuOpen); slash.classList.toggle('active',menuOpen);
+    if(menuOpen) scrollDown();
   }
 
-  function setMode(mode) {
-    activeMode = mode;
-    menuOpen = false;
-    cmdMenu.classList.remove('open');
-    slashBtn.className = 'slash-btn mode-' + mode;
-    modeChipLabel.textContent = mode;
-    modeChip.className = 'mode-chip ' + mode + ' visible';
-    inputWrap.className = 'input-wrap mode-' + mode;
-    inp.placeholder = mode === 'capture' ? 'Capture une info…' : 'Pose ta question…';
+  function setMode(m) {
+    mode=m; menuOpen=false; cmd.classList.remove('open');
+    slash.className='slash-btn m-'+(m==='capture'?'cap':'dem');
+    modeTagLbl.textContent=m; modeTag.className='mode-tag '+m+' vis';
+    inpWrap.className='inp-wrap m-'+(m==='capture'?'cap':'dem');
+    inp.placeholder=m==='capture'?'Capture une info…':'Pose ta question…';
     inp.focus();
   }
 
   function clearMode() {
-    activeMode = null;
-    slashBtn.className = 'slash-btn';
-    modeChip.className = 'mode-chip';
-    inputWrap.className = 'input-wrap';
-    inp.placeholder = 'Capture une info ou pose une question…';
-    inp.focus();
+    mode=null; slash.className='slash-btn'; modeTag.className='mode-tag';
+    inpWrap.className='inp-wrap'; inp.placeholder='Capture ou pose une question…'; inp.focus();
   }
 
-  /* ── TEXTAREA ── */
-  inp.addEventListener('input', () => {
-    inp.style.height = 'auto';
-    inp.style.height = Math.min(inp.scrollHeight, 90) + 'px';
-  });
+  inp.addEventListener('input',()=>{ inp.style.height='auto'; inp.style.height=Math.min(inp.scrollHeight,90)+'px'; });
+  function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();} if(menuOpen&&e.key==='Escape')toggleMenu(); }
 
-  function handleKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
-    if (menuOpen && e.key === 'Escape') { toggleMenu(); }
+  function addMsgT(role,html,tag,tagType,time) {
+    const d=document.createElement('div'); d.className='msg '+role;
+    if(tag){const t=document.createElement('div');t.className='msg-tag '+(tagType||'systeme');t.textContent=tag;d.appendChild(t);}
+    const b=document.createElement('div');b.className='bubble';b.innerHTML=html;d.appendChild(b);
+    const m=document.createElement('span');m.className='msg-time';m.textContent=time||'';d.appendChild(m);
+    msgs.appendChild(d); return d;
   }
-
-  /* ── MESSAGES ── */
-  function addMsg(role, html, tag, tagType) {
-    return addMsgWithTime(role, html, tag, tagType, 'maintenant');
+  function addMsg(role,html,tag,tagType){return addMsgT(role,html,tag,tagType,'maintenant');}
+  function sysMsg(html){
+    const d=document.createElement('div');d.className='msg ai';
+    const t=document.createElement('div');t.className='msg-tag systeme';t.textContent='système';d.appendChild(t);
+    const b=document.createElement('div');b.className='bubble';b.innerHTML=html;d.appendChild(b);
+    msgs.appendChild(d);
   }
+  function showTyping(){const d=document.createElement('div');d.id='typ';d.className='typing';d.innerHTML='<div class="td"></div><div class="td"></div><div class="td"></div>';msgs.appendChild(d);scrollDown();}
+  function hideTyping(){document.getElementById('typ')?.remove();}
+  function scrollDown(){msgs.scrollTop=msgs.scrollHeight;}
 
-  function addMsgWithTime(role, html, tag, tagType, time) {
-    const div = document.createElement('div');
-    div.className = 'msg ' + role;
-    if (tag) {
-      const t = document.createElement('div');
-      t.className = 'msg-tag ' + (tagType || 'systeme');
-      t.textContent = tag;
-      div.appendChild(t);
-    }
-    const b = document.createElement('div');
-    b.className = 'bubble';
-    b.innerHTML = html;
-    div.appendChild(b);
-    const m = document.createElement('span');
-    m.className = 'msg-time';
-    m.textContent = time || '';
-    div.appendChild(m);
-    messagesEl.appendChild(div);
-    return div;
-  }
-
-  function addSystemMsg(html) {
-    const div = document.createElement('div');
-    div.className = 'msg ai';
-    const t = document.createElement('div');
-    t.className = 'msg-tag systeme';
-    t.textContent = '✓ système';
-    div.appendChild(t);
-    const b = document.createElement('div');
-    b.className = 'bubble';
-    b.innerHTML = html;
-    div.appendChild(b);
-    messagesEl.appendChild(div);
-  }
-
-  function showTyping() {
-    const d = document.createElement('div');
-    d.id = 'typ';
-    d.className = 'typing-indicator';
-    d.innerHTML = '<div class="td"></div><div class="td"></div><div class="td"></div>';
-    messagesEl.appendChild(d);
-    scrollDown();
-  }
-  function hideTyping() { document.getElementById('typ')?.remove(); }
-  function scrollDown() { messagesEl.scrollTop = messagesEl.scrollHeight; }
-
-  /* ── SEND ── */
-  async function send() {
-    const text = inp.value.trim();
-    if (!text) return;
-    const mode = activeMode || 'demande';
-    sendBtn.disabled = true;
-    inp.value = '';
-    inp.style.height = 'auto';
-
-    addMsg('user', text.replace(/\n/g, '<br>'));
-    scrollDown();
-    showTyping();
-
+  async function doSend() {
+    const text=inp.value.trim(); if(!text) return;
+    const m=mode||'demande';
+    document.getElementById('send').disabled=true;
+    inp.value=''; inp.style.height='auto';
+    addMsg('user',text.replace(/\n/g,'<br>')); scrollDown(); showTyping();
     try {
-      const res = await fetch(WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id_client: ID_CLIENT,
-          nom_tiroir: activeTiroir,
-          mode: mode,
-          message: text,
-        }),
-      });
-
-      const rawText = await res.text();
-      const cleaned = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-
-      let parsed;
-      try { parsed = JSON.parse(cleaned); }
-      catch { parsed = { type: mode, text: cleaned || 'Réponse vide.' }; }
-
-      hideTyping();
-      const tagLabel = (parsed.type || mode) + ' · #' + activeTiroir;
-      addMsg('ai', parsed.text || cleaned, tagLabel, parsed.type || mode);
-    } catch (e) {
-      hideTyping();
-      addMsg('ai', 'Erreur de connexion. Réessaie.', null, null);
-    }
-
-    scrollDown();
-    sendBtn.disabled = false;
-    inp.focus();
+      const r=await fetch(C.webhooks.chat,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_client:C.client_id,nom_tiroir:tiroir,mode:m,message:text})});
+      const raw=await r.text();
+      const cleaned=raw.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
+      let p; try{p=JSON.parse(cleaned);}catch{p={type:m,text:cleaned||'Réponse vide.'};}
+      hideTyping(); addMsg('ai',p.text||cleaned,(p.type||m)+' · #'+tiroir,p.type||m);
+    } catch(e){ hideTyping(); addMsg('ai','Erreur de connexion. Réessaie.',null,null); }
+    scrollDown(); document.getElementById('send').disabled=false; inp.focus();
   }
 
-  /* ── INIT ── */
-  document.getElementById('logo-badge').textContent =
-    'KCP · ' + KCP_CONFIG.client_id + ' · ' + KCP_CONFIG.client_name;
-  loadTiroirs().then(() => loadHistory());
+  loadTiroirs().then(()=>loadHistory());
 </script>
 </body>
 </html>
