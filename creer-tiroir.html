@@ -203,7 +203,7 @@
     document.getElementById('s-success').classList.remove('on');
     show('s-loading');
     try {
-      await fetch(C.webhooks.chat, { // remplacer par webhook creer_tiroir quand disponible
+      await fetch(C.webhooks.creer_tiroir, {
         method:'POST', headers:{'Content-Type':'application/json'},
         body:JSON.stringify({ id_client:C.client_id, nom_tiroir:nom, categorie:cat, description_breve:desc, type, parent_tiroir:parent||'N/A' })
       });
