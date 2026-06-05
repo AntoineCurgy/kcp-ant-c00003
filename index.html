@@ -11,86 +11,65 @@
   :root {
     --bg:#f6f4ee; --surface:#ffffff; --surface2:#efece2;
     --border:#d3cebd; --border-strong:#b8b2a0;
-    --ink:#16150f; --ink-soft:#3d3b30; --muted:#6c6857;
+    --ink:#16150f; --ink-soft:#3d3b30; --muted:#524e3e;
     --accent:#c8f55a; --accent-deep:#4d6b14;
     --dark:#14160f; --dark-soft:#1d2016; --dark-border:#2c2f22;
     --dark-text:#eef0e5; --dark-muted:#9aa088;
     --r:14px; --font:'Syne',sans-serif; --mono:'DM Mono',monospace;
   }
-  html,body { min-height:100vh; background:var(--bg); color:var(--ink); font-family:var(--font); }
-  body { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2.5rem 1.25rem; }
-  .wrap { width:100%; max-width:400px; display:flex; flex-direction:column; gap:0.65rem; }
+  html { background:#14160f; min-height:100vh; padding:0 1.5rem; }
+  body { background:var(--bg); color:var(--ink); font-family:var(--font); max-width:520px; margin:0 auto;  min-height:calc(100vh - 4rem); padding:2.5rem 2rem 3rem; display:flex; flex-direction:column; gap:1.15rem; }
 
-  /* HEADER */
-  .hdr { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:0.65rem; }
-  .kcp-tag { font-size:11px; font-family:var(--mono); color:var(--accent-deep); letter-spacing:0.15em; text-transform:uppercase; display:block; margin-bottom:0.3rem; }
+  .hdr { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:1.4rem; }
+  .kcp-tag { font-size:11px; font-family:var(--mono); color:var(--accent-deep); letter-spacing:0.15em; text-transform:uppercase; display:block; margin-bottom:0.7rem; }
   .greeting { font-size:28px; font-weight:700; letter-spacing:-0.02em; }
   .greeting .name { color:var(--accent-deep); }
-  .dot { width:5px; height:5px; border-radius:50%; background:var(--accent-deep); animation:pulse 2.4s ease-in-out infinite; }
+  .dot { width:5px; height:5px; border-radius:50%; background:var(--accent-deep); animation:pulse 2.4s ease-in-out infinite; flex-shrink:0; }
   @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(.6)}}
 
-  /* HERO CHAT */
-  .hero {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:1.2rem 1.4rem; background:var(--dark); border:1.5px solid var(--dark-border);
-    border-radius:var(--r); text-decoration:none; position:relative; overflow:hidden;
-    transition:background 0.15s, transform 0.12s;
-  }
+  .hero { display:flex; align-items:center; justify-content:space-between; padding:1.2rem 1.4rem; background:var(--dark); border:1.5px solid var(--dark-border); border-radius:var(--r); text-decoration:none; position:relative; overflow:hidden; transition:background 0.15s, transform 0.12s; }
   .hero::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent); }
   .hero:hover { background:var(--dark-soft); transform:translateY(-1px); }
-  .hero:active { transform:scale(0.99); }
-  .hero-title { font-size:20px; font-weight:500; font-family:var(--mono); color:var(--dark-text); letter-spacing:-0.01em; position:relative; }
+  .hero-title { font-size:20px; font-weight:500; font-family:var(--mono); color:var(--dark-text); }
   .hero-title span { color:var(--accent); }
   .hero-arrow { width:34px; height:34px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--dark); font-size:16px; font-weight:700; transition:transform 0.15s; flex-shrink:0; }
   .hero:hover .hero-arrow { transform:translate(2px,-2px); }
 
-  /* GRID */
-  .grid { display:grid; grid-template-columns:1fr 1fr; gap:0.65rem; }
-  .card {
-    display:flex; flex-direction:column; align-items:flex-start; gap:0.5rem;
-    padding:1.15rem 1.1rem; background:var(--surface); border:1.5px solid var(--border);
-    border-radius:var(--r); text-decoration:none; color:var(--ink);
-    box-shadow:0 1px 4px rgba(22,21,15,0.05); transition:all 0.15s;
-  }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:1.15rem; width:100%; }
+  .card { display:flex; flex-direction:column; align-items:flex-start; gap:0.5rem; padding:1.15rem 1.1rem; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); text-decoration:none; color:var(--ink); transition:all 0.15s; }
   .card:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(22,21,15,0.09); border-color:var(--border-strong); }
-  .card:active { transform:scale(0.98); }
   .card-label { font-size:11px; font-family:var(--mono); color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
-  .card-title { font-size:15px; font-weight:700; color:var(--ink); letter-spacing:-0.01em; line-height:1.2; }
+  .card-title { font-size:15px; font-weight:700; letter-spacing:-0.01em; }
   .card-sub { font-size:11px; font-family:var(--mono); color:var(--muted); line-height:1.4; }
 
-  /* NOTION GROUP */
-  .notion-group { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); overflow:hidden; box-shadow:0 1px 4px rgba(22,21,15,0.04); }
+  .notion-group { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); overflow:hidden; width:100%; }
   .notion-hdr { font-size:11px; font-family:var(--mono); color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; padding:0.65rem 1rem 0.4rem; }
-  .notion-row { display:flex; align-items:center; justify-content:space-between; padding:0.8rem 1rem; text-decoration:none; color:var(--ink-soft); border-top:1px solid var(--border); transition:background 0.12s, color 0.12s; }
+  .notion-row { display:flex; align-items:center; justify-content:space-between; padding:0.8rem 1rem; text-decoration:none; color:var(--ink-soft); border-top:1px solid var(--border); transition:background 0.12s; }
   .notion-row:hover { background:var(--surface2); color:var(--ink); }
-  .notion-left { display:flex; align-items:center; gap:0.65rem; }
+  .notion-left { display:flex; align-items:center; gap:1.15rem; }
   .notion-label { font-size:14px; font-weight:600; }
-  .notion-arr { font-size:12px; color:var(--muted); transition:transform 0.12s; }
-  .notion-row:hover .notion-arr { transform:translateX(2px); }
+  .notion-arr { font-size:12px; color:var(--muted); }
 
-  /* FOOTER */
-  .footer { display:flex; align-items:center; justify-content:center; gap:0.5rem; padding-top:0.1rem; }
+  .footer { display:flex; align-items:center; justify-content:center; gap:0.5rem; margin-top:auto; padding-top:1rem; }
   .footer-text { font-size:11px; font-family:var(--mono); color:var(--muted); }
 
-  /* ANIM */
-  .wrap > * { opacity:0; transform:translateY(8px); animation:up 0.3s ease forwards; }
-  .wrap > :nth-child(1){animation-delay:.04s} .wrap > :nth-child(2){animation-delay:.09s}
-  .wrap > :nth-child(3){animation-delay:.14s} .wrap > :nth-child(4){animation-delay:.19s}
-  .wrap > :nth-child(5){animation-delay:.23s}
+  body > * { opacity:0; transform:translateY(8px); animation:up 0.3s ease forwards; }
+  body > :nth-child(1){animation-delay:.04s} body > :nth-child(2){animation-delay:.09s}
+  body > :nth-child(3){animation-delay:.14s} body > :nth-child(4){animation-delay:.19s}
+  body > :nth-child(5){animation-delay:.23s}
   @keyframes up{to{opacity:1;transform:translateY(0)}}
 
-  @media(max-width:360px){.greeting{font-size:24px}.grid{grid-template-columns:1fr}}
+  @media(max-width:600px){ html{padding:0} body{border-radius:0; min-height:100vh; padding:2rem 1.25rem} }
 </style>
 </head>
 <body>
-<div class="wrap">
 
   <div class="hdr">
     <div>
       <span class="kcp-tag">KCP — Knowledge Context Protocol</span>
       <h1 class="greeting">Bonjour <span class="name" id="c-name">…</span></h1>
     </div>
-    <div class="dot" style="margin-top:6px"></div>
+    <div class="dot" style="margin-top:8px"></div>
   </div>
 
   <a href="./kcp-chat.html" class="hero">
@@ -132,12 +111,11 @@
     <span class="footer-text">système actif · KCP V2</span>
   </div>
 
-</div>
 <script>
-  document.getElementById('c-name').textContent   = KCP_CONFIG.client_name;
-  document.getElementById('n-tiroirs').href        = KCP_CONFIG.notion.tiroirs;
-  document.getElementById('n-reunions').href       = KCP_CONFIG.notion.reunions;
-  document.getElementById('n-todo').href           = KCP_CONFIG.notion.todo;
+  document.getElementById('c-name').textContent = KCP_CONFIG.client_name;
+  document.getElementById('n-tiroirs').href = KCP_CONFIG.notion.tiroirs;
+  document.getElementById('n-reunions').href = KCP_CONFIG.notion.reunions;
+  document.getElementById('n-todo').href = KCP_CONFIG.notion.todo;
   document.title = 'KCP — ' + KCP_CONFIG.client_name;
 </script>
 </body>
