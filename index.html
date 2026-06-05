@@ -9,177 +9,135 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #222222;
-    --border: #2e2e2e; --border-hover: #444;
-    --text: #f0ede8; --text-muted: #888; --text-dim: #555;
-    --accent: #c8f55a;
-    --accent-dim: rgba(200, 245, 90, 0.10); --accent-border: rgba(200, 245, 90, 0.25);
-    --radius: 12px; --radius-lg: 18px;
-    --font-display: 'Syne', sans-serif; --font-mono: 'DM Mono', monospace;
+    --bg:#f6f4ee; --surface:#ffffff; --surface2:#efece2;
+    --border:#d3cebd; --border-strong:#b8b2a0;
+    --ink:#16150f; --ink-soft:#3d3b30; --muted:#6c6857;
+    --accent:#c8f55a; --accent-deep:#4d6b14;
+    --dark:#14160f; --dark-soft:#1d2016; --dark-border:#2c2f22;
+    --dark-text:#eef0e5; --dark-muted:#9aa088;
+    --r:14px; --font:'Syne',sans-serif; --mono:'DM Mono',monospace;
   }
-  html, body { min-height: 100vh; background: var(--bg); color: var(--text); font-family: var(--font-display); }
-  body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2.5rem 1.25rem; min-height: 100vh; }
-  body::before {
-    content: ''; position: fixed; inset: 0;
-    background-image: linear-gradient(rgba(200,245,90,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(200,245,90,0.03) 1px, transparent 1px);
-    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  html,body { min-height:100vh; background:var(--bg); color:var(--ink); font-family:var(--font); }
+  body { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2.5rem 1.25rem; }
+  .wrap { width:100%; max-width:400px; display:flex; flex-direction:column; gap:0.65rem; }
+
+  /* HEADER */
+  .hdr { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:0.65rem; }
+  .kcp-tag { font-size:11px; font-family:var(--mono); color:var(--accent-deep); letter-spacing:0.15em; text-transform:uppercase; display:block; margin-bottom:0.3rem; }
+  .greeting { font-size:28px; font-weight:700; letter-spacing:-0.02em; }
+  .greeting .name { color:var(--accent-deep); }
+  .dot { width:5px; height:5px; border-radius:50%; background:var(--accent-deep); animation:pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(.6)}}
+
+  /* HERO CHAT */
+  .hero {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1.2rem 1.4rem; background:var(--dark); border:1.5px solid var(--dark-border);
+    border-radius:var(--r); text-decoration:none; position:relative; overflow:hidden;
+    transition:background 0.15s, transform 0.12s;
   }
-  .container { width: 100%; max-width: 420px; position: relative; z-index: 1; }
-  .header { text-align: center; margin-bottom: 2.5rem; }
-  .logo {
-    display: inline-block; font-size: 10px; font-family: var(--font-mono); color: var(--accent);
-    letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 1.25rem;
-    padding: 0.3rem 0.75rem; border: 1px solid var(--accent-border); border-radius: 100px; background: var(--accent-dim);
+  .hero::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent); }
+  .hero:hover { background:var(--dark-soft); transform:translateY(-1px); }
+  .hero:active { transform:scale(0.99); }
+  .hero-title { font-size:20px; font-weight:500; font-family:var(--mono); color:var(--dark-text); letter-spacing:-0.01em; position:relative; }
+  .hero-title span { color:var(--accent); }
+  .hero-arrow { width:34px; height:34px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--dark); font-size:16px; font-weight:700; transition:transform 0.15s; flex-shrink:0; }
+  .hero:hover .hero-arrow { transform:translate(2px,-2px); }
+
+  /* GRID */
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:0.65rem; }
+  .card {
+    display:flex; flex-direction:column; align-items:flex-start; gap:0.5rem;
+    padding:1.15rem 1.1rem; background:var(--surface); border:1.5px solid var(--border);
+    border-radius:var(--r); text-decoration:none; color:var(--ink);
+    box-shadow:0 1px 4px rgba(22,21,15,0.05); transition:all 0.15s;
   }
-  .greeting { font-size: 36px; font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
-  .greeting .name { color: var(--accent); }
-  .tagline { font-size: 13px; font-family: var(--font-mono); color: var(--text-dim); }
-  .section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 0.5rem; margin-bottom: 0.75rem; overflow: hidden; }
-  .section-label { font-size: 10px; font-family: var(--font-mono); color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; padding: 0.5rem 0.75rem 0.35rem; }
-  .btn {
-    display: flex; align-items: center; justify-content: space-between; width: 100%;
-    padding: 0.9rem 1rem; background: transparent; border: none; border-radius: 10px;
-    cursor: pointer; text-decoration: none; color: var(--text); transition: background 0.12s, transform 0.1s; gap: 0.75rem;
-  }
-  .btn:hover { background: var(--surface2); }
-  .btn:active { transform: scale(0.985); background: var(--surface2); }
-  .btn-left { display: flex; align-items: center; gap: 0.75rem; }
-  .btn-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
-  .icon-green  { background: rgba(200,245,90,0.12); color: var(--accent); }
-  .icon-blue   { background: rgba(100,180,255,0.12); color: #64b4ff; }
-  .icon-amber  { background: rgba(255,190,80,0.12);  color: #ffbe50; }
-  .icon-purple { background: rgba(180,120,255,0.12); color: #b478ff; }
-  .btn-text { text-align: left; }
-  .btn-title { font-size: 15px; font-weight: 600; display: block; line-height: 1.2; }
-  .btn-sub { font-size: 11px; font-family: var(--font-mono); color: var(--text-dim); display: block; margin-top: 1px; }
-  .btn-arrow { font-size: 16px; color: var(--text-dim); flex-shrink: 0; transition: color 0.12s, transform 0.12s; }
-  .btn:hover .btn-arrow { color: var(--text-muted); transform: translateX(2px); }
-  .btn-highlight { border: 1px solid var(--accent-border); background: var(--accent-dim); }
-  .btn-highlight:hover { background: rgba(200,245,90,0.15); }
-  .btn-highlight .btn-arrow { color: var(--accent); opacity: 0.7; }
-  .btn-highlight:hover .btn-arrow { color: var(--accent); opacity: 1; }
-  .btn-telegram { border: 1px solid rgba(42,171,238,0.30); background: rgba(42,171,238,0.12); }
-  .btn-telegram:hover { background: rgba(42,171,238,0.18); }
-  .btn-telegram .btn-icon { background: rgba(42,171,238,0.20); color: #2aabee; }
-  .btn-telegram .btn-arrow { color: #2aabee; opacity: 0.7; }
-  .btn-telegram:hover .btn-arrow { color: #2aabee; opacity: 1; }
-  .sep { height: 1px; background: var(--border); margin: 0 0.5rem; }
-  .footer { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 1.75rem; }
-  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2.2s ease-in-out infinite; }
-  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.8); } }
-  .footer-text { font-size: 11px; font-family: var(--font-mono); color: var(--text-dim); }
-  @media (max-width: 380px) { .greeting { font-size: 28px; } .btn-title { font-size: 14px; } }
+  .card:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(22,21,15,0.09); border-color:var(--border-strong); }
+  .card:active { transform:scale(0.98); }
+  .card-label { font-size:11px; font-family:var(--mono); color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
+  .card-title { font-size:15px; font-weight:700; color:var(--ink); letter-spacing:-0.01em; line-height:1.2; }
+  .card-sub { font-size:11px; font-family:var(--mono); color:var(--muted); line-height:1.4; }
+
+  /* NOTION GROUP */
+  .notion-group { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); overflow:hidden; box-shadow:0 1px 4px rgba(22,21,15,0.04); }
+  .notion-hdr { font-size:11px; font-family:var(--mono); color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; padding:0.65rem 1rem 0.4rem; }
+  .notion-row { display:flex; align-items:center; justify-content:space-between; padding:0.8rem 1rem; text-decoration:none; color:var(--ink-soft); border-top:1px solid var(--border); transition:background 0.12s, color 0.12s; }
+  .notion-row:hover { background:var(--surface2); color:var(--ink); }
+  .notion-left { display:flex; align-items:center; gap:0.65rem; }
+  .notion-label { font-size:14px; font-weight:600; }
+  .notion-arr { font-size:12px; color:var(--muted); transition:transform 0.12s; }
+  .notion-row:hover .notion-arr { transform:translateX(2px); }
+
+  /* FOOTER */
+  .footer { display:flex; align-items:center; justify-content:center; gap:0.5rem; padding-top:0.1rem; }
+  .footer-text { font-size:11px; font-family:var(--mono); color:var(--muted); }
+
+  /* ANIM */
+  .wrap > * { opacity:0; transform:translateY(8px); animation:up 0.3s ease forwards; }
+  .wrap > :nth-child(1){animation-delay:.04s} .wrap > :nth-child(2){animation-delay:.09s}
+  .wrap > :nth-child(3){animation-delay:.14s} .wrap > :nth-child(4){animation-delay:.19s}
+  .wrap > :nth-child(5){animation-delay:.23s}
+  @keyframes up{to{opacity:1;transform:translateY(0)}}
+
+  @media(max-width:360px){.greeting{font-size:24px}.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
 
-  <header class="header">
-    <span class="logo">KCP — Knowledge Context Protocol</span>
-    <h1 class="greeting">Bonjour <span class="name" id="client-name">…</span></h1>
-    <p class="tagline" id="client-tagline">// chargement…</p>
-  </header>
+  <div class="hdr">
+    <div>
+      <span class="kcp-tag">KCP — Knowledge Context Protocol</span>
+      <h1 class="greeting">Bonjour <span class="name" id="c-name">…</span></h1>
+    </div>
+    <div class="dot" style="margin-top:6px"></div>
+  </div>
 
-  <div class="section">
-    <p class="section-label">Ta Mémoire Digitale</p>
-    <a id="btn-telegram" href="#" class="btn btn-telegram" target="_blank" rel="noopener">
-      <div class="btn-left">
-        <div class="btn-icon">✈</div>
-        <div class="btn-text">
-          <span class="btn-title">Telegram</span>
-          <span class="btn-sub">parle à ta mémoire · capture, demande</span>
-        </div>
-      </div>
-      <span class="btn-arrow">→</span>
+  <a href="./kcp-chat.html" class="hero">
+    <span class="hero-title">Chat <span>mémoire</span></span>
+    <div class="hero-arrow">→</div>
+  </a>
+
+  <div class="grid">
+    <a href="./tiroir.html" class="card">
+      <span class="card-label">IA</span>
+      <span class="card-title">Initialiser une IA</span>
+      <span class="card-sub">charger un tiroir dans Claude ou ChatGPT</span>
+    </a>
+    <a href="./creer-tiroir.html" class="card">
+      <span class="card-label">Nouveau</span>
+      <span class="card-title">Nouveau tiroir</span>
+      <span class="card-sub">créer un tiroir ou sous-tiroir</span>
     </a>
   </div>
 
-  <div class="section">
-    <p class="section-label">Accès rapide</p>
-    <a id="btn-notion-tiroirs" href="#" class="btn" target="_blank" rel="noopener">
-      <div class="btn-left">
-        <div class="btn-icon icon-green">🗂</div>
-        <div class="btn-text">
-          <span class="btn-title">Mes tiroirs</span>
-          <span class="btn-sub">Notion · base de tous tes tiroirs</span>
-        </div>
-      </div>
-      <span class="btn-arrow">→</span>
+  <div class="notion-group">
+    <div class="notion-hdr">Notion</div>
+    <a id="n-tiroirs" href="#" class="notion-row" target="_blank">
+      <div class="notion-left"><span>🗂</span><span class="notion-label">Mes tiroirs</span></div>
+      <span class="notion-arr">→</span>
     </a>
-    <div class="sep"></div>
-    <a id="btn-notion-reunions" href="#" class="btn" target="_blank" rel="noopener">
-      <div class="btn-left">
-        <div class="btn-icon icon-blue">📋</div>
-        <div class="btn-text">
-          <span class="btn-title">Réunions</span>
-          <span class="btn-sub">Notion · transcriptions et résumés</span>
-        </div>
-      </div>
-      <span class="btn-arrow">→</span>
+    <a id="n-reunions" href="#" class="notion-row" target="_blank">
+      <div class="notion-left"><span>📋</span><span class="notion-label">Réunions</span></div>
+      <span class="notion-arr">→</span>
     </a>
-    <div class="sep"></div>
-    <a id="btn-notion-todo" href="#" class="btn" target="_blank" rel="noopener">
-      <div class="btn-left">
-        <div class="btn-icon icon-amber">✅</div>
-        <div class="btn-text">
-          <span class="btn-title">To Do</span>
-          <span class="btn-sub">Notion · tâches actives</span>
-        </div>
-      </div>
-      <span class="btn-arrow">→</span>
+    <a id="n-todo" href="#" class="notion-row" target="_blank">
+      <div class="notion-left"><span>✅</span><span class="notion-label">To Do</span></div>
+      <span class="notion-arr">→</span>
     </a>
   </div>
 
-  <div class="section">
-    <p class="section-label">Actions</p>
-    <a href="./kcp-chat.html" class="btn">
-      <div class="btn-left">
-        <div class="btn-icon icon-blue">💬</div>
-        <div class="btn-text">
-          <span class="btn-title">Chat mémoire</span>
-          <span class="btn-sub">web · capture et demande</span>
-        </div>
-      </div>
-      <span class="btn-arrow">→</span>
-    </a>
-    <div class="sep"></div>
-    <a id="btn-telegram-create" href="#" class="btn" target="_blank" rel="noopener">
-      <div class="btn-left">
-        <div class="btn-icon icon-purple">🗂</div>
-        <div class="btn-text">
-          <span class="btn-title">Créer un tiroir</span>
-          <span class="btn-sub">via Telegram · /creer_tiroir</span>
-        </div>
-      </div>
-      <span class="btn-arrow">→</span>
-    </a>
-    <div class="sep"></div>
-    <a href="./tiroir.html" class="btn btn-highlight">
-      <div class="btn-left">
-        <div class="btn-icon icon-green">⚡</div>
-        <div class="btn-text">
-          <span class="btn-title">Initialiser une IA</span>
-          <span class="btn-sub">charger un tiroir dans Claude ou ChatGPT</span>
-        </div>
-      </div>
-      <span class="btn-arrow">→</span>
-    </a>
-  </div>
-
-  <footer class="footer">
+  <div class="footer">
     <div class="dot"></div>
     <span class="footer-text">système actif · KCP V2</span>
-  </footer>
+  </div>
 
 </div>
 <script>
-  document.getElementById('client-name').textContent    = KCP_CONFIG.client_name;
-  document.getElementById('client-tagline').textContent = '// ' + KCP_CONFIG.client_id + ' · workspace personnel';
-  document.getElementById('btn-telegram').href          = KCP_CONFIG.telegram_bot;
-  document.getElementById('btn-telegram-create').href   = KCP_CONFIG.telegram_bot + '?start=creer_tiroir';
-  document.getElementById('btn-notion-tiroirs').href    = KCP_CONFIG.notion.tiroirs;
-  document.getElementById('btn-notion-reunions').href   = KCP_CONFIG.notion.reunions;
-  document.getElementById('btn-notion-todo').href       = KCP_CONFIG.notion.todo;
+  document.getElementById('c-name').textContent   = KCP_CONFIG.client_name;
+  document.getElementById('n-tiroirs').href        = KCP_CONFIG.notion.tiroirs;
+  document.getElementById('n-reunions').href       = KCP_CONFIG.notion.reunions;
+  document.getElementById('n-todo').href           = KCP_CONFIG.notion.todo;
   document.title = 'KCP — ' + KCP_CONFIG.client_name;
 </script>
 </body>
