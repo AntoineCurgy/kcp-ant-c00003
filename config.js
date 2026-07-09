@@ -7,7 +7,7 @@
 // ─────────────────────────────────────────────────────────────
 
 const KCP_WEBHOOKS = {
-  auth:         '[WEBHOOK AUTH — A COMPLETER]', // ← colle ici l'URL du webhook Make d'authentification
+  auth:         'https://hook.eu2.make.com/8j3iyx5tob56ppw63nffemqii2nqjs8w', // Make: KCP - Auth - Login
   chat:         'https://hook.eu2.make.com/8rh94l9v2lk87hr6g1jredxban13ftqu',
   history:      'https://hook.eu2.make.com/26bhrahrq5xipqcem9hpq3jvdgrmd1si',
   tiroirs:      'https://hook.eu2.make.com/4kskheb6ie4q6nupygterd84uj5kok2g',
