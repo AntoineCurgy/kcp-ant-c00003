@@ -303,10 +303,12 @@
       id: it.id || null,
       url: it.url || null,
     }));
+    // Liens Notion prets a inserer (vrais sauts de ligne cote JS ; Make ne fait qu'un replace direct).
+    const liens_additionnels = ajouts.map(a => a.url).filter(Boolean).join('\n');
     try {
       const r = await fetch(C.webhooks.prompt, {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ client_id:C.client_id, nom_tiroir:sel.value, ajouts })
+        body:JSON.stringify({ client_id:C.client_id, nom_tiroir:sel.value, ajouts, liens_additionnels })
       });
       const d = await r.json();
       const raw = d.prompt || d.content || d.text || '';
