@@ -28,12 +28,45 @@
 
   .card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); padding:1.5rem; box-shadow:0 1px 6px rgba(22,21,15,0.06); display:flex; flex-direction:column; gap:1.35rem; }
   .label { font-size:12px; font-family:var(--mono); color:var(--ink); letter-spacing:0.08em; text-transform:uppercase; font-weight:500; display:block; margin-bottom:0.5rem; }
+  .label .opt { color:var(--muted); text-transform:none; letter-spacing:0; font-weight:500; }
   .sel-wrap { position:relative; }
   select { width:100%; background:var(--surface2); color:var(--ink); border:1.5px solid var(--border); border-radius:10px; padding:0.85rem 2.5rem 0.85rem 1rem; font-family:var(--font); font-size:15px; font-weight:600; appearance:none; cursor:pointer; outline:none; transition:border-color 0.15s; }
   select.empty { color:var(--muted); font-weight:500; }
   select:focus { border-color:var(--ink); background:var(--surface); }
   .arr { position:absolute; right:1rem; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--ink-soft); font-size:12px; }
   .sep { height:1.5px; background:var(--border); }
+
+  /* ── MULTI-SELECT (ajouts) ── */
+  .ms { position:relative; display:flex; flex-direction:column; gap:0.6rem; }
+  .ms-head { position:relative; }
+  .ms-trigger { width:100%; display:flex; align-items:center; justify-content:space-between; background:var(--surface2); color:var(--ink); border:1.5px solid var(--border); border-radius:10px; padding:0.85rem 1rem; font-family:var(--font); font-size:15px; font-weight:600; cursor:pointer; text-align:left; transition:border-color 0.15s; }
+  .ms-trigger:hover:not(:disabled) { border-color:var(--border-strong); }
+  .ms-trigger.open { border-color:var(--ink); background:var(--surface); }
+  .ms-trigger.empty .ms-trigger-lbl { color:var(--muted); font-weight:500; }
+  .ms-trigger:disabled { opacity:0.5; cursor:not-allowed; }
+  .ms-trigger .arr { position:static; transform:none; transition:transform 0.15s; }
+  .ms-trigger.open .arr { transform:rotate(180deg); }
+
+  .ms-panel { position:absolute; top:calc(100% + 0.4rem); left:0; right:0; z-index:20; display:none; flex-direction:column; max-height:240px; overflow-y:auto; border:1.5px solid var(--border-strong); border-radius:10px; background:var(--surface); box-shadow:0 10px 26px rgba(22,21,15,0.14); }
+  .ms-panel.open { display:flex; }
+  .ms-panel::-webkit-scrollbar { width:4px; }
+  .ms-panel::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+  .ms-opt { display:flex; align-items:center; gap:0.7rem; padding:0.7rem 0.9rem; cursor:pointer; border-top:1px solid var(--border); transition:background 0.1s; }
+  .ms-opt:first-child { border-top:none; }
+  .ms-opt:hover { background:var(--surface2); }
+  .ms-opt.disabled { opacity:0.4; cursor:not-allowed; }
+  .ms-check { width:18px; height:18px; border-radius:5px; border:1.5px solid var(--border-strong); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--dark); background:var(--surface); }
+  .ms-opt.on .ms-check { background:var(--accent); border-color:var(--accent-deep); }
+  .ms-opt-lbl { font-size:14px; font-family:var(--mono); font-weight:500; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ms-badge { margin-left:auto; font-size:10px; font-family:var(--mono); letter-spacing:0.06em; padding:2px 6px; border-radius:4px; text-transform:uppercase; flex-shrink:0; }
+  .ms-badge.pcp { color:var(--accent-deep); background:rgba(77,107,20,0.10); }
+  .ms-badge.anx { color:var(--ink-soft); background:rgba(22,21,15,0.07); }
+  .ms-note { font-size:12px; font-family:var(--mono); color:var(--muted); padding:0.75rem 0.9rem; }
+
+  .ms-chips { display:none; flex-wrap:wrap; gap:0.4rem; }
+  .ms-chip { display:inline-flex; align-items:center; gap:0.45rem; padding:0.3rem 0.3rem 0.3rem 0.6rem; background:var(--dark); color:var(--dark-text); border-radius:100px; font-family:var(--mono); font-size:12px; font-weight:500; }
+  .ms-chip .x { cursor:pointer; opacity:0.6; font-size:14px; line-height:1; width:16px; height:16px; display:flex; align-items:center; justify-content:center; border-radius:50%; }
+  .ms-chip .x:hover { opacity:1; background:var(--dark-border); }
 
   /* LLM BUTTONS */
   .llm-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.15rem; }
@@ -98,12 +131,26 @@
 
   <div class="card">
     <div>
-      <span class="label">Tiroir</span>
+      <span class="label">Tiroir principal</span>
       <div class="sel-wrap">
         <select id="sel" class="empty" onchange="onChange()">
           <option value="">— choisir un tiroir —</option>
         </select>
         <span class="arr">▾</span>
+      </div>
+    </div>
+
+    <div>
+      <span class="label">Ajouter au contexte <span class="opt">— tiroirs / annexes · optionnel · max 3</span></span>
+      <div class="ms" id="ms">
+        <div class="ms-head">
+          <button type="button" class="ms-trigger empty" id="ms-trigger" onclick="toggleMs()" disabled>
+            <span class="ms-trigger-lbl" id="ms-lbl">— sélectionne d'abord un tiroir principal —</span>
+            <span class="arr">▾</span>
+          </button>
+          <div class="ms-panel" id="ms-panel"></div>
+        </div>
+        <div class="ms-chips" id="ms-chips"></div>
       </div>
     </div>
 
@@ -144,11 +191,24 @@
   let prompt = '';
   const sel = document.getElementById('sel');
 
+  const MAX_ADD = 3;
+  let secondItems = [];            // liste PCP + ANX (2e menu)
+  const selected = new Map();      // key -> item sélectionné
+
+  function keyOf(it){ return it.id || it.nom_tiroir; }
+  function isAnx(it){ return (it.type && String(it.type).toUpperCase() === 'ANX') || /^ANX/i.test(it.id || ''); }
+  function labelOf(it){ return (isAnx(it) ? '@' : '#') + it.nom_tiroir; }
+
   async function loadTiroirs() {
     try {
       const r = await fetch(C.webhooks.tiroirs, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({client_id:C.client_id}) });
-      const list = await r.json();
-      list.forEach(t => { const o=document.createElement('option'); o.value=t.nom_tiroir; o.textContent='#'+t.nom_tiroir; sel.appendChild(o); });
+      const data = await r.json();
+      // Deux listes : pcp (menu principal) et pcp_anx (multi-select). Tolérant à l'ancien format tableau.
+      let pcp, all;
+      if (Array.isArray(data)) { pcp = data; all = data; }
+      else { pcp = data.pcp || data.principaux || []; all = data.pcp_anx || data.tous || pcp; }
+      pcp.forEach(t => { const o=document.createElement('option'); o.value=t.nom_tiroir; o.textContent='#'+t.nom_tiroir; sel.appendChild(o); });
+      secondItems = all;
     } catch(e) { console.warn('Tiroirs unavailable'); }
   }
 
@@ -157,20 +217,102 @@
     sel.classList.toggle('empty', !has);
     document.getElementById('btn-claude').disabled = !has;
     document.getElementById('btn-chatgpt').disabled = !has;
+    // Le multi-select suit le tiroir principal.
+    document.getElementById('ms-trigger').disabled = !has;
+    // Le tiroir principal ne peut pas être aussi un ajout.
+    selected.forEach((it, k) => { if (it.nom_tiroir === sel.value) selected.delete(k); });
+    closeMs();
+    renderMs();
     hideAll();
   }
 
+  /* ── Multi-select ── */
+  function renderMs() {
+    const panel = document.getElementById('ms-panel');
+    const trig = document.getElementById('ms-trigger');
+    const trigLbl = document.getElementById('ms-lbl');
+    const chipsWrap = document.getElementById('ms-chips');
+    const mainNom = sel.value;
+
+    panel.innerHTML = '';
+    const available = secondItems.filter(it => it.nom_tiroir !== mainNom);
+    if (!available.length) {
+      const n = document.createElement('div'); n.className = 'ms-note'; n.textContent = 'Aucun élément disponible.'; panel.appendChild(n);
+    }
+    available.forEach(it => {
+      const k = keyOf(it);
+      const on = selected.has(k);
+      const full = (selected.size >= MAX_ADD) && !on;
+      const row = document.createElement('div');
+      row.className = 'ms-opt' + (on ? ' on' : '') + (full ? ' disabled' : '');
+      const anx = isAnx(it);
+      row.innerHTML =
+        '<span class="ms-check">' + (on ? '✓' : '') + '</span>' +
+        '<span class="ms-opt-lbl">' + labelOf(it) + '</span>' +
+        '<span class="ms-badge ' + (anx ? 'anx' : 'pcp') + '">' + (anx ? 'ANX' : 'PCP') + '</span>';
+      row.onclick = () => { if (full) return; toggleItem(it); };
+      panel.appendChild(row);
+    });
+
+    // Chips sélectionnés (avec retrait)
+    chipsWrap.innerHTML = '';
+    selected.forEach((it, k) => {
+      const c = document.createElement('span'); c.className = 'ms-chip';
+      const lbl = document.createElement('span'); lbl.textContent = labelOf(it); c.appendChild(lbl);
+      const x = document.createElement('span'); x.className = 'x'; x.textContent = '×';
+      x.onclick = (e) => { e.stopPropagation(); selected.delete(k); renderMs(); hideAll(); };
+      c.appendChild(x); chipsWrap.appendChild(c);
+    });
+    chipsWrap.style.display = selected.size ? 'flex' : 'none';
+
+    // Libellé du déclencheur
+    if (!mainNom) { trigLbl.textContent = "— sélectionne d'abord un tiroir principal —"; trig.classList.add('empty'); }
+    else if (selected.size) { trigLbl.textContent = selected.size + ' ajout' + (selected.size > 1 ? 's' : '') + ' · max ' + MAX_ADD; trig.classList.remove('empty'); }
+    else { trigLbl.textContent = '— tiroirs / annexes —'; trig.classList.add('empty'); }
+  }
+
+  function toggleItem(it) {
+    const k = keyOf(it);
+    if (selected.has(k)) selected.delete(k);
+    else { if (selected.size >= MAX_ADD) return; selected.set(k, it); }
+    renderMs();
+    hideAll();
+  }
+
+  function toggleMs() {
+    const trig = document.getElementById('ms-trigger'); if (trig.disabled) return;
+    const panel = document.getElementById('ms-panel');
+    const open = panel.classList.toggle('open');
+    trig.classList.toggle('open', open);
+  }
+  function closeMs() {
+    document.getElementById('ms-panel').classList.remove('open');
+    document.getElementById('ms-trigger').classList.remove('open');
+  }
+  document.addEventListener('click', (e) => {
+    const ms = document.getElementById('ms');
+    if (ms && !ms.contains(e.target)) closeMs();
+  });
+
   async function launch(llm) {
     if (!sel.value) return;
-    hideAll(); show('s-loading');
+    closeMs(); hideAll(); show('s-loading');
+    const ajouts = [...selected.values()].map(it => ({
+      nom_tiroir: it.nom_tiroir,
+      type: isAnx(it) ? 'ANX' : 'PCP',
+      id: it.id || null,
+    }));
     try {
-      const r = await fetch(C.webhooks.prompt, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({client_id:C.client_id, nom_tiroir:sel.value}) });
+      const r = await fetch(C.webhooks.prompt, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ client_id:C.client_id, nom_tiroir:sel.value, ajouts })
+      });
       const d = await r.json();
       const raw = d.prompt || d.content || d.text || '';
       prompt = raw ? decodeURIComponent(escape(atob(raw))) : '';
       await copy(prompt);
       hide('s-loading');
-      document.getElementById('s-tiroir').textContent = '#' + sel.value;
+      document.getElementById('s-tiroir').textContent = '#' + sel.value + (ajouts.length ? '  +' + ajouts.length : '');
       show('s-success');
       window.open(llm==='claude'?'https://claude.ai/new':'https://chatgpt.com/', '_blank');
     } catch(e) { hide('s-loading'); showErr('Erreur lors du chargement. Réessaie.'); }

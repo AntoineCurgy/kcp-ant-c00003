@@ -69,6 +69,8 @@
   /* FOOTER */
   .footer { display:flex; align-items:center; justify-content:center; gap:0.5rem; margin-top:auto; padding-top:1rem; }
   .footer-text { font-size:11px; font-family:var(--mono); color:var(--muted); }
+  .logout { margin-left:auto; font-size:11px; font-family:var(--mono); color:var(--muted); background:none; border:none; cursor:pointer; text-decoration:none; padding:0; transition:color 0.15s; }
+  .logout:hover { color:var(--ink); }
 
   /* ANIM */
   body > * { opacity:0; transform:translateY(8px); animation:up 0.3s ease forwards; }
@@ -118,22 +120,18 @@
       <div class="notion-left"><span>📋</span><span class="notion-label">Réunions</span></div>
       <span class="notion-arr">→</span>
     </a>
-    <a id="n-todo" href="#" class="notion-row" target="_blank">
-      <div class="notion-left"><span>✅</span><span class="notion-label">To Do</span></div>
-      <span class="notion-arr">→</span>
-    </a>
   </div>
 
   <div class="footer">
     <div class="dot"></div>
     <span class="footer-text">système actif · KCP V2</span>
+    <button class="logout" onclick="kcpLogout()">déconnexion</button>
   </div>
 
 <script>
   document.getElementById('c-name').textContent = KCP_CONFIG.client_name;
-  document.getElementById('n-tiroirs').href = KCP_CONFIG.notion.tiroirs;
-  document.getElementById('n-reunions').href = KCP_CONFIG.notion.reunions;
-  document.getElementById('n-todo').href = KCP_CONFIG.notion.todo;
+  if (KCP_CONFIG.notion.tiroirs)  document.getElementById('n-tiroirs').href = KCP_CONFIG.notion.tiroirs;
+  if (KCP_CONFIG.notion.reunions) document.getElementById('n-reunions').href = KCP_CONFIG.notion.reunions;
   document.title = 'KCP — ' + KCP_CONFIG.client_name;
 </script>
 </body>

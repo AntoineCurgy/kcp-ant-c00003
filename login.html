@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KCP — Connexion</title>
+<script src="./config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#f6f4ee; --surface:#ffffff; --surface2:#efece2;
+    --border:#d3cebd; --border-strong:#b8b2a0;
+    --ink:#16150f; --ink-soft:#3d3b30; --muted:#524e3e;
+    --accent:#c8f55a; --accent-deep:#4d6b14;
+    --dark:#14160f; --dark-soft:#1d2016; --dark-border:#2c2f22;
+    --dark-text:#eef0e5; --dark-muted:#9aa088;
+    --r:14px; --font:'Syne',sans-serif; --mono:'DM Mono',monospace;
+  }
+  html { background:#14160f; min-height:100vh; padding:0 1.5rem; }
+  body { background:var(--bg); color:var(--ink); font-family:var(--font); max-width:600px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:2.5rem 2rem 3rem; }
+  .wrap { width:100%; max-width:100%; display:flex; flex-direction:column; gap:1.15rem; }
+
+  .brand { display:flex; align-items:center; gap:0.65rem; margin-bottom:0.4rem; }
+  .brand-mark { width:34px; height:34px; border-radius:8px; background:var(--accent); color:var(--dark); display:flex; align-items:center; justify-content:center; font-family:var(--font); font-weight:700; font-size:16px; letter-spacing:-0.03em; }
+  .kcp-tag { font-size:11px; font-family:var(--mono); color:var(--accent-deep); letter-spacing:0.15em; text-transform:uppercase; display:block; margin-bottom:0.7rem; }
+  .page-title { font-size:28px; font-weight:700; letter-spacing:-0.02em; }
+  .page-sub { font-size:13px; font-family:var(--mono); color:var(--muted); margin-top:0.35rem; }
+
+  .card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); padding:1.5rem; box-shadow:0 1px 6px rgba(22,21,15,0.06); display:flex; flex-direction:column; gap:1.25rem; }
+  .field { display:flex; flex-direction:column; gap:0.5rem; }
+  .label { font-size:12px; font-family:var(--mono); color:var(--ink); letter-spacing:0.08em; text-transform:uppercase; font-weight:500; }
+  input { width:100%; background:var(--surface2); color:var(--ink); border:1.5px solid var(--border); border-radius:10px; padding:0.85rem 1rem; font-family:var(--font); font-size:15px; font-weight:600; outline:none; transition:border-color 0.15s; }
+  input::placeholder { color:var(--muted); font-weight:400; }
+  input:focus { border-color:var(--ink); background:var(--surface); }
+
+  .btn-dark { width:100%; padding:1rem; background:var(--dark); color:var(--dark-text); border:none; border-radius:10px; font-family:var(--font); font-size:15px; font-weight:700; cursor:pointer; transition:background 0.15s, transform 0.1s; display:flex; align-items:center; justify-content:center; gap:0.6rem; }
+  .btn-dark:hover { background:var(--dark-soft); }
+  .btn-dark:active { transform:scale(0.99); }
+  .btn-dark:disabled { background:var(--border); color:var(--muted); cursor:not-allowed; }
+
+  .spinner { width:15px; height:15px; border:2px solid rgba(238,240,229,0.35); border-top-color:var(--accent); border-radius:50%; animation:spin 0.7s linear infinite; display:none; }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .btn-dark.loading .spinner { display:inline-block; }
+  .btn-dark.loading .btn-lbl { opacity:0.6; }
+
+  .error { display:none; padding:0.8rem 1rem; border:1.5px solid rgba(150,40,40,0.35); background:rgba(150,40,40,0.06); border-radius:10px; font-size:13px; font-family:var(--mono); color:#8a2f2f; }
+  .error.on { display:block; }
+
+  .footer { display:flex; align-items:center; justify-content:center; gap:0.5rem; }
+  .footer-text { font-size:11px; font-family:var(--mono); color:var(--muted); }
+  .dot { width:5px; height:5px; border-radius:50%; background:var(--accent-deep); animation:pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(.6)}}
+
+  .wrap > * { opacity:0; transform:translateY(8px); animation:up 0.3s ease forwards; }
+  .wrap > :nth-child(1){animation-delay:.04s} .wrap > :nth-child(2){animation-delay:.09s}
+  .wrap > :nth-child(3){animation-delay:.14s}
+  @keyframes up{to{opacity:1;transform:translateY(0)}}
+  @media(max-width:600px){ html{padding:0} body{border-radius:0; min-height:100vh} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div>
+    <div class="brand"><div class="brand-mark">K</div></div>
+    <span class="kcp-tag">KCP — Knowledge Context Protocol</span>
+    <h1 class="page-title">Connexion</h1>
+    <p class="page-sub">Accède à ta mémoire de projets.</p>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label class="label" for="user">Identifiant</label>
+      <input type="text" id="user" placeholder="identifiant" autocomplete="username" autocapitalize="none" spellcheck="false" onkeydown="handleKey(event)">
+    </div>
+    <div class="field">
+      <label class="label" for="pass">Mot de passe</label>
+      <input type="password" id="pass" placeholder="••••••••" autocomplete="current-password" onkeydown="handleKey(event)">
+    </div>
+
+    <div class="error" id="err"></div>
+
+    <button class="btn-dark" id="submit" onclick="doLogin()">
+      <span class="spinner"></span>
+      <span class="btn-lbl">Se connecter →</span>
+    </button>
+  </div>
+
+  <div class="footer"><div class="dot"></div><span class="footer-text">système actif · KCP V2</span></div>
+
+</div>
+<script>
+  const C = KCP_CONFIG;
+
+  // Déjà connecté → on va directement à l'accueil.
+  if (kcpGetSession()) { location.replace('./index.html'); }
+
+  const btn = document.getElementById('submit');
+  const err = document.getElementById('err');
+
+  function handleKey(e) { if (e.key === 'Enter') { e.preventDefault(); doLogin(); } }
+  function showErr(m) { err.textContent = m; err.classList.add('on'); }
+  function clearErr() { err.classList.remove('on'); }
+
+  async function doLogin() {
+    const username = document.getElementById('user').value.trim();
+    const password = document.getElementById('pass').value;
+    clearErr();
+    if (!username || !password) { showErr('Identifiant et mot de passe requis.'); return; }
+
+    btn.classList.add('loading'); btn.disabled = true;
+    try {
+      const r = await fetch(C.webhooks.auth, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ username, password })
+      });
+      const raw = await r.text();
+      const cleaned = raw.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
+      let d = {};
+      try { d = JSON.parse(cleaned); } catch (e) { d = {}; }
+
+      // Succès si ok !== false ET un client_id est renvoyé.
+      const okFlag = (d.ok === undefined) ? true : !!d.ok;
+      if (r.ok && okFlag && d.client_id) {
+        kcpSetSession({
+          client_id:   d.client_id,
+          client_name: d.client_name || d.client_id,
+          notion:      d.notion || {},
+        });
+        location.replace('./index.html');
+        return;
+      }
+      showErr(d.error || 'Identifiant ou mot de passe incorrect.');
+    } catch (e) {
+      showErr('Connexion impossible. Réessaie.');
+    }
+    btn.classList.remove('loading'); btn.disabled = false;
+  }
+
+  document.getElementById('user').focus();
+</script>
+</body>
+</html>
