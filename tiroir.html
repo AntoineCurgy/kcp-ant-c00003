@@ -250,7 +250,7 @@
         '<span class="ms-check">' + (on ? '✓' : '') + '</span>' +
         '<span class="ms-opt-lbl">' + labelOf(it) + '</span>' +
         '<span class="ms-badge ' + (anx ? 'anx' : 'pcp') + '">' + (anx ? 'ANX' : 'PCP') + '</span>';
-      row.onclick = () => { if (full) return; toggleItem(it); };
+      row.onclick = (e) => { e.stopPropagation(); if (full) return; toggleItem(it); };
       panel.appendChild(row);
     });
 
