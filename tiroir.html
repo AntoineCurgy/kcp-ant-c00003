@@ -301,6 +301,7 @@
       nom_tiroir: it.nom_tiroir,
       type: isAnx(it) ? 'ANX' : 'PCP',
       id: it.id || null,
+      url: it.url || null,
     }));
     try {
       const r = await fetch(C.webhooks.prompt, {
