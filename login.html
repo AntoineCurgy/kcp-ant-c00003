@@ -131,7 +131,7 @@
         location.replace('./index.html');
         return;
       }
-      showErr(d.error || 'Identifiant ou mot de passe incorrect.');
+      showErr(d.message || d.error || 'Identifiant ou mot de passe incorrect.');
     } catch (e) {
       showErr('Connexion impossible. Réessaie.');
     }
