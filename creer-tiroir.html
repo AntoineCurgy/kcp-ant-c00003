@@ -30,22 +30,18 @@
 
   .field { display:flex; flex-direction:column; gap:0.5rem; }
   .label { font-size:12px; font-family:var(--mono); color:var(--ink); letter-spacing:0.08em; text-transform:uppercase; font-weight:500; display:flex; align-items:center; justify-content:space-between; }
-  .hint { font-size:12px; color:var(--accent-deep); text-transform:none; letter-spacing:0; font-weight:500; font-family:var(--mono); }
+  .hint { font-size:12px; color:var(--muted); text-transform:none; letter-spacing:0; font-weight:500; font-family:var(--mono); }
+  .hint.err { color:#8a2f2f; }
 
   input[type=text], textarea, select { width:100%; background:var(--surface2); color:var(--ink); border:1.5px solid var(--border); border-radius:10px; padding:0.85rem 1rem; font-family:var(--font); font-size:15px; font-weight:600; outline:none; appearance:none; transition:border-color 0.15s; }
   input::placeholder, textarea::placeholder { color:var(--muted); font-weight:400; }
-  input:focus, textarea:focus, select:focus { border-color:var(--ink); background:var(--surface); }
+  input:focus, textarea:focus { border-color:var(--ink); background:var(--surface); }
 
   .pfx { position:relative; }
   .pfx-sym { position:absolute; left:1rem; top:50%; transform:translateY(-50%); font-size:15px; font-weight:600; color:var(--ink-soft); pointer-events:none; font-family:var(--mono); }
-  .pfx input { padding-left:1.65rem; }
+  .pfx input { padding-left:1.65rem; font-family:var(--mono); }
 
   textarea { resize:none; min-height:80px; line-height:1.5; font-weight:500; font-size:14px; }
-
-  .sel-wrap { position:relative; }
-  .sel-wrap select { padding-right:2.5rem; cursor:pointer; }
-  .sel-wrap select.empty { color:var(--muted); font-weight:500; }
-  .arr { position:absolute; right:1rem; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--ink-soft); font-size:12px; }
 
   .toggle { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; }
   .tog-btn { padding:0.8rem; border-radius:10px; border:1.5px solid var(--border); background:var(--surface2); color:var(--muted); font-family:var(--font); font-size:15px; font-weight:700; cursor:pointer; transition:all 0.15s; }
@@ -65,11 +61,15 @@
   @keyframes spin{to{transform:rotate(360deg)}}
   .loading-txt { font-size:14px; font-family:var(--mono); color:var(--ink-soft); }
 
-  .success { flex-direction:column; gap:0.55rem; padding:1.25rem; background:var(--dark); border:1.5px solid var(--dark-border); border-radius:10px; position:relative; overflow:hidden; }
+  .success { flex-direction:column; gap:0.75rem; padding:1.25rem; background:var(--dark); border:1.5px solid var(--dark-border); border-radius:10px; position:relative; overflow:hidden; }
   .success::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent); }
   .s-label { font-size:11px; font-family:var(--mono); color:var(--accent); letter-spacing:0.15em; text-transform:uppercase; }
   .s-name { font-size:18px; font-weight:700; color:var(--dark-text); font-family:var(--mono); }
-  .s-sub { font-size:12px; font-family:var(--mono); color:var(--dark-muted); }
+  .notion-btn { display:inline-flex; align-items:center; justify-content:center; gap:0.4rem; margin-top:0.25rem; background:var(--accent); color:var(--dark); text-decoration:none; border-radius:8px; padding:0.7rem 1rem; font-family:var(--mono); font-size:13px; font-weight:600; transition:opacity 0.15s; }
+  .notion-btn:hover { opacity:0.85; }
+
+  .error-state { display:none; padding:0.9rem 1rem; border:1.5px solid var(--border-strong); border-radius:10px; font-size:13px; font-family:var(--mono); color:var(--ink-soft); }
+  .error-state.on { display:block; }
 
   .footer { display:flex; align-items:center; justify-content:center; gap:0.5rem; }
   .footer-text { font-size:11px; font-family:var(--mono); color:var(--muted); }
@@ -94,37 +94,27 @@
 
   <div class="card">
     <div class="field">
-      <label class="label" for="nom">Nom du tiroir</label>
+      <label class="label" for="nom">
+        Nom du tiroir
+        <span class="hint" id="nom-hint">minuscules, chiffres, tirets</span>
+      </label>
       <div class="pfx">
         <span class="pfx-sym">#</span>
-        <input type="text" id="nom" placeholder="nom-du-tiroir" autocomplete="off" spellcheck="false" oninput="check()">
+        <input type="text" id="nom" placeholder="nom-du-tiroir" autocomplete="off" spellcheck="false" maxlength="60" oninput="onNom()">
       </div>
     </div>
 
     <div class="field">
-      <label class="label" for="parent">
-        Parent
-        <span class="hint" id="type-hint">→ tiroir principal</span>
-      </label>
-      <div class="sel-wrap">
-        <select id="parent" class="empty" onchange="onParent()">
-          <option value="">Aucun — tiroir principal</option>
-        </select>
-        <span class="arr">▾</span>
-      </div>
-    </div>
-
-    <div class="field">
-      <span class="label">Catégorie</span>
+      <span class="label">Sphère</span>
       <div class="toggle">
-        <button class="tog-btn on" id="btn-pro" onclick="setCat('pro')">Pro</button>
-        <button class="tog-btn" id="btn-perso" onclick="setCat('perso')">Perso</button>
+        <button class="tog-btn on" id="btn-pro" onclick="setSphere('professional')">Professionnel</button>
+        <button class="tog-btn" id="btn-perso" onclick="setSphere('personal')">Personnel</button>
       </div>
     </div>
 
     <div class="field">
-      <label class="label" for="desc">Description brève</label>
-      <textarea id="desc" placeholder="Ce tiroir regroupe…" maxlength="200" oninput="check()"></textarea>
+      <label class="label" for="perim">Périmètre déclaré</label>
+      <textarea id="perim" placeholder="Ce tiroir sert à…" maxlength="400" oninput="check()"></textarea>
     </div>
 
     <button class="btn-dark" id="submit" onclick="submit()" disabled>Créer le tiroir →</button>
@@ -137,8 +127,10 @@
     <div class="state success" id="s-success">
       <span class="s-label">Tiroir créé ✓</span>
       <span class="s-name" id="s-name"></span>
-      <span class="s-sub" id="s-sub"></span>
+      <a class="notion-btn" id="s-notion" href="#" target="_blank" rel="noopener">Ouvrir dans Notion →</a>
     </div>
+
+    <div class="error-state" id="s-error"></div>
   </div>
 
   <div class="footer"><div class="dot"></div><span class="footer-text">système actif · KCP V2</span></div>
@@ -146,79 +138,88 @@
 </div>
 <script>
   const C = KCP_CONFIG;
-  const LABELS = { PCP:'tiroir principal', SCP:'sous-tiroir', SSCP:'sous-sous-tiroir' };
-  let cat = 'pro';
 
-  async function loadParents() {
-    try {
-      const r = await fetch(C.webhooks.tiroirs, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({client_id:C.client_id}) });
-      const data = await r.json();
-      const list = Array.isArray(data) ? data : (data.pcp || data.principaux || []);
-      const sel = document.getElementById('parent');
-      list.forEach(t => {
-        const o = document.createElement('option');
-        o.value = t.nom_tiroir; o.dataset.type = t.type || 'PCP';
-        o.textContent = '#' + t.nom_tiroir;
-        sel.appendChild(o);
-      });
-    } catch(e) {}
-  }
+  // Garde de session (config.js redirige déjà, double sécurité + id_client).
+  const _session = (typeof kcpGetSession === 'function') ? kcpGetSession() : JSON.parse(localStorage.getItem('kcp_session') || 'null');
+  if (!_session || !_session.client_id) { location.replace('./login.html'); }
+  const id_client = _session ? _session.client_id : null;
 
-  function onParent() {
-    const sel = document.getElementById('parent');
-    const hint = document.getElementById('type-hint');
-    sel.classList.toggle('empty', !sel.value);
-    if (!sel.value) { hint.textContent = '→ tiroir principal'; }
-    else {
-      const pt = sel.options[sel.selectedIndex].dataset.type || 'PCP';
-      const ct = pt==='PCP'?'sous-tiroir':pt==='SCP'?'sous-sous-tiroir':'sous-tiroir';
-      hint.textContent = '→ ' + ct + ' de #' + sel.value;
-    }
+  let sphere = 'professional';
+
+  const nomEl = document.getElementById('nom');
+  const perimEl = document.getElementById('perim');
+  const submitEl = document.getElementById('submit');
+  const nomHint = document.getElementById('nom-hint');
+
+  // Normalise en direct : minuscules, chiffres, tirets uniquement.
+  function onNom() {
+    const raw = nomEl.value;
+    const clean = raw.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    if (clean !== raw) { nomEl.value = clean; nomHint.textContent = 'seuls a-z, 0-9 et - sont autorisés'; nomHint.classList.add('err'); }
+    else { nomHint.textContent = 'minuscules, chiffres, tirets'; nomHint.classList.remove('err'); }
     check();
   }
 
-  function setCat(v) {
-    cat = v;
-    document.getElementById('btn-pro').classList.toggle('on', v==='pro');
-    document.getElementById('btn-perso').classList.toggle('on', v==='perso');
+  function setSphere(v) {
+    sphere = v;
+    document.getElementById('btn-pro').classList.toggle('on', v === 'professional');
+    document.getElementById('btn-perso').classList.toggle('on', v === 'personal');
   }
 
   function check() {
-    document.getElementById('submit').disabled =
-      !(document.getElementById('nom').value.trim() && document.getElementById('desc').value.trim());
+    const nomOk = nomEl.value.trim().length >= 2;
+    const perimOk = perimEl.value.trim().length >= 10;
+    submitEl.disabled = !(nomOk && perimOk);
   }
 
-  function getType() {
-    const sel = document.getElementById('parent');
-    if (!sel.value) return 'PCP';
-    const pt = sel.options[sel.selectedIndex].dataset.type || 'PCP';
-    return pt==='PCP'?'SCP':pt==='SCP'?'SSCP':'SSCP';
-  }
+  function show(id) { document.getElementById(id).classList.add('on'); }
+  function hide(id) { document.getElementById(id).classList.remove('on'); }
+  function showErr(m) { const e = document.getElementById('s-error'); e.textContent = m; e.classList.add('on'); }
+  function clearErr() { document.getElementById('s-error').classList.remove('on'); }
 
   async function submit() {
-    const nom = document.getElementById('nom').value.trim();
-    const desc = document.getElementById('desc').value.trim();
-    const parent = document.getElementById('parent').value;
-    const type = getType();
-    const btn = document.getElementById('submit');
-    btn.style.display = 'none';
-    document.getElementById('s-success').classList.remove('on');
-    show('s-loading');
-    try {
-      await fetch(C.webhooks.chat, { // remplacer par webhook creer_tiroir quand disponible
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ id_client:C.client_id, nom_tiroir:nom, categorie:cat, description_breve:desc, type, parent_tiroir:parent||'N/A' })
-      });
-    } catch(e) {}
-    hide('s-loading');
-    document.getElementById('s-name').textContent = '#' + nom;
-    document.getElementById('s-sub').textContent = LABELS[type] + (parent?' de #'+parent:'') + ' · ' + cat;
-    show('s-success');
-  }
+    const nom_tiroir = nomEl.value.trim();
+    const perimetre_declare = perimEl.value.trim();
+    if (nom_tiroir.length < 2 || perimetre_declare.length < 10) return;
 
-  function show(id){document.getElementById(id).classList.add('on')}
-  function hide(id){document.getElementById(id).classList.remove('on')}
-  loadParents();
+    clearErr();
+    submitEl.style.display = 'none';
+    hide('s-success');
+    show('s-loading');
+
+    let res, data = {};
+    try {
+      res = await fetch(C.webhooks.creer_tiroir, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_client, nom_tiroir, sphere, perimetre_declare })
+      });
+      // Lire le corps AVANT tout test de statut (la 409 porte error:label_exists).
+      const raw = await res.text();
+      const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+      try { data = JSON.parse(cleaned); } catch (e) { data = {}; }
+    } catch (e) {
+      hide('s-loading');
+      submitEl.style.display = '';
+      showErr('Création impossible. Réessaie.');
+      return;
+    }
+
+    hide('s-loading');
+
+    if (res.ok && data.success) {
+      document.getElementById('s-name').textContent = '#' + nom_tiroir;
+      const link = document.getElementById('s-notion');
+      if (data.notion_url) { link.href = data.notion_url; link.style.display = ''; }
+      else { link.style.display = 'none'; }
+      show('s-success');
+    } else if (res.status === 409 || data.error === 'label_exists') {
+      submitEl.style.display = '';
+      showErr('Ce nom existe déjà, choisis-en un autre.');
+    } else {
+      submitEl.style.display = '';
+      showErr('Création impossible. Réessaie.');
+    }
+  }
 </script>
 </body>
 </html>

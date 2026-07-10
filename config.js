@@ -12,7 +12,7 @@ const KCP_WEBHOOKS = {
   history:      'https://hook.eu2.make.com/26bhrahrq5xipqcem9hpq3jvdgrmd1si',
   tiroirs:      'https://hook.eu2.make.com/4kskheb6ie4q6nupygterd84uj5kok2g',
   prompt:       'https://hook.eu2.make.com/q86mcoelj49v49gcobam9tbixur6xvm5',
-  creer_tiroir: 'https://hook.eu2.make.com/w8ivn34zeodtip4l6nyfcbq6nh3sso66',
+  creer_tiroir: '[WEBHOOK NOUVEAU TIROIR — A COMPLETER]', // ← hook du scenario Make "KCP - Nouveau Tiroir"
 };
 
 const KCP_SESSION_KEY = 'kcp_session';
