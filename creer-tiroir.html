@@ -113,7 +113,10 @@
     </div>
 
     <div class="field">
-      <label class="label" for="perim">Périmètre déclaré</label>
+      <label class="label" for="perim">
+        Périmètre déclaré
+        <span class="hint" id="perim-hint">min. 10 caractères</span>
+      </label>
       <textarea id="perim" placeholder="Ce tiroir sert à…" maxlength="400" oninput="check()"></textarea>
     </div>
 
@@ -168,7 +171,17 @@
 
   function check() {
     const nomOk = nomEl.value.trim().length >= 2;
-    const perimOk = perimEl.value.trim().length >= 10;
+    const perimLen = perimEl.value.trim().length;
+    const perimOk = perimLen >= 10;
+    const ph = document.getElementById('perim-hint');
+    if (perimLen > 0 && !perimOk) {
+      const reste = 10 - perimLen;
+      ph.textContent = 'encore ' + reste + ' caractère' + (reste > 1 ? 's' : '');
+      ph.classList.add('err');
+    } else {
+      ph.textContent = 'min. 10 caractères';
+      ph.classList.remove('err');
+    }
     submitEl.disabled = !(nomOk && perimOk);
   }
 
