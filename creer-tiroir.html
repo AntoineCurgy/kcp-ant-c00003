@@ -126,12 +126,11 @@
       <span class="loading-txt">Création en cours…</span>
     </div>
 
-    <div class="state success" id="s-success">
-      <span class="s-name" id="s-name"></span>
-      <span class="s-msg">Tiroir créé, prêt à recevoir vos réunions et vos conversations IA.</span>
-    </div>
-
     <div class="error-state" id="s-error"></div>
+  </div>
+
+  <div class="state success" id="s-success">
+    <span class="s-msg">Tiroir créé, prêt à recevoir vos réunions et vos conversations IA.</span>
   </div>
 
   <div class="footer"><div class="dot"></div><span class="footer-text">système actif · KCP V2</span></div>
@@ -218,7 +217,6 @@
     hide('s-loading');
 
     if (res.ok && data.success) {
-      document.getElementById('s-name').textContent = '#' + nom_tiroir;
       show('s-success');
     } else if (res.status === 409 || data.error === 'label_exists') {
       submitEl.style.display = '';
