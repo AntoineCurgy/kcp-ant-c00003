@@ -65,8 +65,7 @@
   .success::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent); }
   .s-label { font-size:11px; font-family:var(--mono); color:var(--accent); letter-spacing:0.15em; text-transform:uppercase; }
   .s-name { font-size:18px; font-weight:700; color:var(--dark-text); font-family:var(--mono); }
-  .notion-btn { display:inline-flex; align-items:center; justify-content:center; gap:0.4rem; margin-top:0.25rem; background:var(--accent); color:var(--dark); text-decoration:none; border-radius:8px; padding:0.7rem 1rem; font-family:var(--mono); font-size:13px; font-weight:600; transition:opacity 0.15s; }
-  .notion-btn:hover { opacity:0.85; }
+  .s-msg { font-size:13px; font-family:var(--mono); color:var(--dark-muted); line-height:1.5; }
 
   .error-state { display:none; padding:0.9rem 1rem; border:1.5px solid var(--border-strong); border-radius:10px; font-size:13px; font-family:var(--mono); color:var(--ink-soft); }
   .error-state.on { display:block; }
@@ -107,8 +106,8 @@
     <div class="field">
       <span class="label">Sphère</span>
       <div class="toggle">
-        <button class="tog-btn on" id="btn-pro" onclick="setSphere('professional')">Professionnel</button>
-        <button class="tog-btn" id="btn-perso" onclick="setSphere('personal')">Personnel</button>
+        <button class="tog-btn on" id="btn-pro" onclick="setSphere('pro')">Professionnel</button>
+        <button class="tog-btn" id="btn-perso" onclick="setSphere('perso')">Personnel</button>
       </div>
     </div>
 
@@ -128,9 +127,8 @@
     </div>
 
     <div class="state success" id="s-success">
-      <span class="s-label">Tiroir créé ✓</span>
       <span class="s-name" id="s-name"></span>
-      <a class="notion-btn" id="s-notion" href="#" target="_blank" rel="noopener">Ouvrir dans Notion →</a>
+      <span class="s-msg">Tiroir créé, prêt à recevoir vos réunions et vos conversations IA.</span>
     </div>
 
     <div class="error-state" id="s-error"></div>
@@ -147,7 +145,7 @@
   if (!_session || !_session.client_id) { location.replace('./login.html'); }
   const id_client = _session ? _session.client_id : null;
 
-  let sphere = 'professional';
+  let sphere = 'pro';
 
   const nomEl = document.getElementById('nom');
   const perimEl = document.getElementById('perim');
@@ -165,8 +163,8 @@
 
   function setSphere(v) {
     sphere = v;
-    document.getElementById('btn-pro').classList.toggle('on', v === 'professional');
-    document.getElementById('btn-perso').classList.toggle('on', v === 'personal');
+    document.getElementById('btn-pro').classList.toggle('on', v === 'pro');
+    document.getElementById('btn-perso').classList.toggle('on', v === 'perso');
   }
 
   function check() {
@@ -221,9 +219,6 @@
 
     if (res.ok && data.success) {
       document.getElementById('s-name').textContent = '#' + nom_tiroir;
-      const link = document.getElementById('s-notion');
-      if (data.notion_url) { link.href = data.notion_url; link.style.display = ''; }
-      else { link.style.display = 'none'; }
       show('s-success');
     } else if (res.status === 409 || data.error === 'label_exists') {
       submitEl.style.display = '';
