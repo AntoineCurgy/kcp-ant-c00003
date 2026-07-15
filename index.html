@@ -53,6 +53,7 @@
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:1.15rem; }
   .card { display:flex; flex-direction:column; align-items:flex-start; gap:0.5rem; padding:1.15rem 1.2rem; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); text-decoration:none; color:var(--ink); transition:all 0.15s; }
   .card:hover { border-color:var(--border-strong); box-shadow:0 3px 10px rgba(22,21,15,0.08); }
+  .card.wide { grid-column:1 / -1; }
   .card-label { font-size:11px; font-family:var(--mono); color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
   .card-title { font-size:15px; font-weight:700; letter-spacing:-0.01em; }
   .card-sub { font-size:11px; font-family:var(--mono); color:var(--muted); line-height:1.4; }
@@ -106,7 +107,12 @@
     <a href="./creer-tiroir.html" class="card">
       <span class="card-label">Nouveau</span>
       <span class="card-title">Nouveau tiroir</span>
-      <span class="card-sub">créer un tiroir ou sous-tiroir</span>
+      <span class="card-sub">créer un nouveau tiroir</span>
+    </a>
+    <a href="./modifier-perimetre.html" class="card wide">
+      <span class="card-label">Périmètre</span>
+      <span class="card-title">Modifier un périmètre</span>
+      <span class="card-sub">mettre à jour le périmètre d'un tiroir</span>
     </a>
   </div>
 

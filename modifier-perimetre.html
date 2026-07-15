@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KCP — Modifier un périmètre</title>
+<script src="./config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#f6f4ee; --surface:#ffffff; --surface2:#efece2;
+    --border:#d3cebd; --border-strong:#b8b2a0;
+    --ink:#16150f; --ink-soft:#3d3b30; --muted:#524e3e;
+    --accent:#c8f55a; --accent-deep:#4d6b14;
+    --dark:#14160f; --dark-soft:#1d2016; --dark-border:#2c2f22;
+    --dark-text:#eef0e5; --dark-muted:#9aa088;
+    --r:14px; --font:'Syne',sans-serif; --mono:'DM Mono',monospace;
+  }
+  html { background:#14160f; min-height:100vh; padding:0 1.5rem; }
+  body { background:var(--bg); color:var(--ink); font-family:var(--font); max-width:600px; margin:0 auto;  min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:2.5rem 2rem 3rem; }
+  .wrap { width:100%; max-width:100%; display:flex; flex-direction:column; gap:1.15rem; }
+
+  .back { display:inline-flex; align-items:center; gap:0.4rem; font-size:13px; font-family:var(--mono); font-weight:500; color:var(--ink-soft); text-decoration:none; padding:0.45rem 0.9rem; border:1.5px solid var(--border-strong); border-radius:100px; background:var(--surface); transition:all 0.15s; align-self:flex-start; margin-bottom:1.4rem; }
+  .back:hover { color:var(--ink); border-color:var(--ink); }
+  .kcp-tag { font-size:11px; font-family:var(--mono); color:var(--accent-deep); letter-spacing:0.15em; text-transform:uppercase; display:block; margin-bottom:0.7rem; }
+  .page-title { font-size:28px; font-weight:700; letter-spacing:-0.02em; }
+
+  .card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); padding:1.5rem; box-shadow:0 1px 6px rgba(22,21,15,0.06); display:flex; flex-direction:column; gap:1.25rem; }
+
+  .field { display:flex; flex-direction:column; gap:0.5rem; }
+  .label { font-size:12px; font-family:var(--mono); color:var(--ink); letter-spacing:0.08em; text-transform:uppercase; font-weight:500; display:flex; align-items:center; justify-content:space-between; }
+  .hint { font-size:12px; color:var(--muted); text-transform:none; letter-spacing:0; font-weight:500; font-family:var(--mono); }
+  .hint.err { color:#8a2f2f; }
+
+  textarea { width:100%; background:var(--surface2); color:var(--ink); border:1.5px solid var(--border); border-radius:10px; padding:0.85rem 1rem; font-family:var(--font); font-size:14px; font-weight:500; outline:none; resize:none; min-height:110px; line-height:1.5; transition:border-color 0.15s; }
+  textarea::placeholder { color:var(--muted); font-weight:400; }
+  textarea:focus { border-color:var(--ink); background:var(--surface); }
+  textarea:disabled { opacity:0.55; cursor:not-allowed; }
+
+  .sel-wrap { position:relative; }
+  select { width:100%; background:var(--surface2); color:var(--ink); border:1.5px solid var(--border); border-radius:10px; padding:0.85rem 2.5rem 0.85rem 1rem; font-family:var(--mono); font-size:14px; font-weight:500; appearance:none; cursor:pointer; outline:none; transition:border-color 0.15s; }
+  select.empty { color:var(--muted); }
+  select:focus { border-color:var(--ink); background:var(--surface); }
+  .arr { position:absolute; right:1rem; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--ink-soft); font-size:12px; }
+
+  .btn-dark { width:100%; padding:1rem; background:var(--dark); color:var(--dark-text); border:none; border-radius:10px; font-family:var(--font); font-size:15px; font-weight:700; cursor:pointer; transition:background 0.15s, transform 0.1s; }
+  .btn-dark:hover { background:var(--dark-soft); }
+  .btn-dark:active { transform:scale(0.99); }
+  .btn-dark:disabled { background:var(--border); color:var(--muted); cursor:not-allowed; }
+
+  .state { display:none; }
+  .state.on { display:flex; }
+  .loading { align-items:center; gap:0.75rem; padding:1rem; background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; }
+  .spinner { width:16px; height:16px; border:2px solid var(--border-strong); border-top-color:var(--ink); border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-txt { font-size:14px; font-family:var(--mono); color:var(--ink-soft); }
+
+  .success { flex-direction:column; gap:0.6rem; padding:1.25rem; background:var(--dark); border:1.5px solid var(--dark-border); border-radius:10px; position:relative; overflow:hidden; }
+  .success::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent); }
+  .s-msg { font-size:14px; font-family:var(--mono); color:var(--dark-text); }
+
+  .error-state { display:none; padding:0.9rem 1rem; border:1.5px solid var(--border-strong); border-radius:10px; font-size:13px; font-family:var(--mono); color:var(--ink-soft); }
+  .error-state.on { display:block; }
+
+  .footer { display:flex; align-items:center; justify-content:center; gap:0.5rem; }
+  .footer-text { font-size:11px; font-family:var(--mono); color:var(--muted); }
+  .dot { width:5px; height:5px; border-radius:50%; background:var(--accent-deep); animation:pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(.6)}}
+
+  .wrap > * { opacity:0; transform:translateY(8px); animation:up 0.3s ease forwards; }
+  .wrap > :nth-child(1){animation-delay:.04s} .wrap > :nth-child(2){animation-delay:.09s}
+  .wrap > :nth-child(3){animation-delay:.13s}
+  @keyframes up{to{opacity:1;transform:translateY(0)}}
+  @media(max-width:600px){ html{padding:0} body{border-radius:0; min-height:100vh} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div>
+    <a href="./index.html" class="back">← Retour</a>
+    <span class="kcp-tag">KCP — Knowledge Context Protocol</span>
+    <h1 class="page-title">Modifier un périmètre</h1>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label class="label" for="sel">Tiroir</label>
+      <div class="sel-wrap">
+        <select id="sel" class="empty" onchange="onSelect()">
+          <option value="">— choisir un tiroir —</option>
+        </select>
+        <span class="arr">▾</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label" for="perim">
+        Périmètre déclaré
+        <span class="hint" id="perim-hint">min. 10 caractères</span>
+      </label>
+      <textarea id="perim" placeholder="Sélectionne d'abord un tiroir…" maxlength="400" oninput="check()" disabled></textarea>
+    </div>
+
+    <button class="btn-dark" id="submit" onclick="submit()" disabled>Mettre à jour →</button>
+
+    <div class="state loading" id="s-loading">
+      <div class="spinner"></div>
+      <span class="loading-txt">Mise à jour en cours…</span>
+    </div>
+
+    <div class="error-state" id="s-error"></div>
+  </div>
+
+  <div class="state success" id="s-success">
+    <span class="s-msg">Périmètre mis à jour.</span>
+  </div>
+
+  <div class="footer"><div class="dot"></div><span class="footer-text">système actif · KCP V2</span></div>
+
+</div>
+<script>
+  const C = KCP_CONFIG;
+
+  const _session = (typeof kcpGetSession === 'function') ? kcpGetSession() : JSON.parse(localStorage.getItem('kcp_session') || 'null');
+  if (!_session || !_session.client_id) { location.replace('./login.html'); }
+  const id_client = _session ? _session.client_id : null;
+
+  const sel = document.getElementById('sel');
+  const perimEl = document.getElementById('perim');
+  const submitEl = document.getElementById('submit');
+  const perimHint = document.getElementById('perim-hint');
+
+  const items = {};        // doc_int_id -> item {nom_tiroir, type, perimetre_declare, ...}
+  let original = '';       // périmètre actuel du tiroir sélectionné
+
+  async function loadTiroirs() {
+    try {
+      const r = await fetch(C.webhooks.tiroirs, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({client_id:id_client}) });
+      const data = await r.json();
+      const list = Array.isArray(data) ? data : (data.pcp_anx || data.tous || data.pcp || []);
+      list.forEach(t => {
+        if (!t.doc_int_id) return;
+        items[t.doc_int_id] = t;
+        const o = document.createElement('option');
+        o.value = t.doc_int_id;
+        o.textContent = (String(t.type).toUpperCase() === 'ANX' ? '@' : '#') + t.nom_tiroir;
+        sel.appendChild(o);
+      });
+    } catch(e) { console.warn('Tiroirs unavailable'); }
+  }
+
+  function onSelect() {
+    hideAll();
+    const it = items[sel.value];
+    sel.classList.toggle('empty', !sel.value);
+    if (!it) {
+      perimEl.value = ''; perimEl.disabled = true; original = '';
+    } else {
+      original = it.perimetre_declare || '';
+      perimEl.value = original;
+      perimEl.disabled = false;
+    }
+    check();
+  }
+
+  function check() {
+    const val = perimEl.value.trim();
+    const len = val.length;
+    if (len > 0 && len < 10) {
+      const reste = 10 - len;
+      perimHint.textContent = 'encore ' + reste + ' caractère' + (reste > 1 ? 's' : '');
+      perimHint.classList.add('err');
+    } else {
+      perimHint.textContent = 'min. 10 caractères';
+      perimHint.classList.remove('err');
+    }
+    // actif si un tiroir choisi, périmètre >= 10, ET modifié
+    submitEl.disabled = !(sel.value && len >= 10 && val !== original.trim());
+  }
+
+  function show(id) { document.getElementById(id).classList.add('on'); }
+  function hide(id) { document.getElementById(id).classList.remove('on'); }
+  function hideAll() { hide('s-loading'); hide('s-success'); document.getElementById('s-error').classList.remove('on'); }
+  function showErr(m) { const e = document.getElementById('s-error'); e.textContent = m; e.classList.add('on'); }
+
+  async function submit() {
+    const doc_int_id = sel.value;
+    const perimetre_declare = perimEl.value.trim();
+    if (!doc_int_id || perimetre_declare.length < 10) return;
+
+    hideAll();
+    submitEl.style.display = 'none';
+    show('s-loading');
+
+    let res, data = {};
+    try {
+      res = await fetch(C.webhooks.update_perimetre, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ id_client, doc_int_id, perimetre_declare })
+      });
+      const raw = await res.text();
+      const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+      try { data = JSON.parse(cleaned); } catch (e) { data = {}; }
+    } catch (e) {
+      hide('s-loading'); submitEl.style.display = ''; showErr('Mise à jour impossible. Réessaie.');
+      return;
+    }
+
+    hide('s-loading');
+
+    if (res.ok && data.success) {
+      // refléter la nouvelle valeur en mémoire pour une éventuelle nouvelle édition
+      if (items[doc_int_id]) items[doc_int_id].perimetre_declare = perimetre_declare;
+      original = perimetre_declare;
+      submitEl.style.display = '';
+      submitEl.disabled = true;
+      show('s-success');
+    } else {
+      submitEl.style.display = '';
+      showErr('Mise à jour impossible. Réessaie.');
+    }
+  }
+
+  loadTiroirs();
+</script>
+</body>
+</html>
