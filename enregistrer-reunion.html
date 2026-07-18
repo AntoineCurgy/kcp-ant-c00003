@@ -157,7 +157,8 @@
 
   async function submit() {
     const meeting_url = urlEl.value.trim();
-    const titre_reunion = titreEl.value.trim();
+    // Nettoie le titre des caracteres qui casseraient le JSON cote automatisation.
+    const titre_reunion = titreEl.value.trim().replace(/["\\\r\n]/g, ' ').replace(/\s+/g, ' ').trim();
     if (!isValidUrl(meeting_url)) return;
 
     clearErr();
