@@ -14,6 +14,7 @@ const KCP_WEBHOOKS = {
   prompt:       'https://hook.eu2.make.com/q86mcoelj49v49gcobam9tbixur6xvm5',
   creer_tiroir: 'https://hook.eu2.make.com/eb7lvgopight6cd56vw2hyclimy8mu7x', // Make: KCP - Nouveau Tiroir
   update_perimetre: 'https://hook.eu2.make.com/mrtjwmxnmnhy9vus3vlmn6ps99oowa15', // Make: KCP - Update Perimetre
+  creer_bot: '', // Make: KCP - Meeting BaaS - Creer Bot (a remplir apres build du scenario)
 };
 
 const KCP_SESSION_KEY = 'kcp_session';
